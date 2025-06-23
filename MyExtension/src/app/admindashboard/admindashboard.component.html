@@ -1,0 +1,116 @@
+<div class="admin-dashboard">
+  <h2>Admin Dashboard</h2>
+
+  <!-- Top controls: Create buttons + Search + Dropdown -->
+  <div class="top-controls">
+    <!-- Create buttons -->
+    <div class="create-buttons">
+      <button class="btn btn-info text-white" (click)="openCreateProjectModal()">Create Project</button>
+      <button class="btn primary" (click)="openCreateTaskModal()">Create Task</button>
+      <button class="btn primary" (click)="openCreateUserModal()">Create User</button>
+    </div>
+
+    <!-- MENU ICON AND DROPDOWN --><!-- Search bar + Dropdown -->
+   <div class="right-controls">
+    <input type="text" [(ngModel)]="searchTerm" placeholder="Search by username/email/role" />
+    <div class="view-buttons">
+      <button class="btn secondary" (click)="goviewproject()">📁 View Projects</button>
+      <button class="btn secondary" (click)="goviewtask()">📝 View All Tasks</button>
+    </div>
+  </div>
+
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table class="user-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.role }}</td>
+          <td>
+            <button (click)="editUser(user)" class="btn small edit">Edit</button>
+            <button (click)="deleteUser(user.id)" class="btn small delete">Delete</button>
+            <button (click)="viewUser(user)" class="btn small view">View</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- User Modal -->
+  <div class="modal-backdrop" *ngIf="showUserModal">
+    <div class="modal-content">
+      <button class="close-btn" (click)="closeUserModal()">×</button>
+      <h2 style="text-align: center; margin-bottom: 20px;">
+        {{ editingUserId ? 'Edit User' : 'Create User' }}
+      </h2>
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="user-form">
+        <div class="form-row">
+          <input formControlName="username" placeholder="Username" />
+          <input formControlName="email" placeholder="Email" />
+          <input formControlName="password" [type]="editingUserId ? 'text' : 'password'" placeholder="Password"
+            [required]="!editingUserId" />
+          <div *ngIf="editingUserId">
+            <input formControlName="newPassword" type="password" placeholder="New Password (optional)" />
+          </div>
+          <select formControlName="role">
+            <option value="User">User</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+        <div class="form-buttons">
+          <button type="submit" class="btn primary">{{ editingUserId ? 'Update' : 'Create' }}</button>
+          <button type="button" class="btn secondary" (click)="closeUserModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Task Modal -->
+  <div class="modal-backdrop" *ngIf="showTaskModal">
+    <div class="modal-content modern-modal">
+      <button class="close-btn" (click)="closeTaskModal()">×</button>
+      <h2 class="modal-title">Create Task</h2>
+      <form [formGroup]="taskForm" (ngSubmit)="submitTask()">
+        <div class="form-group">
+          <label for="taskName">Task Name</label>
+          <input id="taskName" formControlName="name" placeholder="Enter task name" class="modal-input" />
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn primary">Create Task</button>
+          <button type="button" class="btn secondary" (click)="closeTaskModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Project Modal -->
+  <div class="modal-backdrop" *ngIf="showProjectModal">
+    <div class="modal-content modern-modal">
+      <button class="close-btn" (click)="closeProjectModal()">×</button>
+      <h2 class="modal-title">Create Project</h2>
+      <form [formGroup]="projectForm" (ngSubmit)="submitProject()">
+        <div class="form-group">
+          <label for="projectName">Project Name</label>
+          <input id="projectName" formControlName="name" placeholder="Enter project name" class="modal-input" />
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn primary">Create Project</button>
+          <button type="button" class="btn secondary" (click)="closeProjectModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>

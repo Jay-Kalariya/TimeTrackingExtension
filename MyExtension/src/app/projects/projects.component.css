@@ -1,0 +1,81 @@
+.container {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: "Segoe UI", sans-serif;
+}
+
+h2, h3 {
+  margin-top: 2rem;
+}
+
+.success {
+  color: green;
+  font-weight: 500;
+}
+
+.error {
+  color: red;
+  font-weight: 500;
+}
+
+.project-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+}
+
+.project-table th,
+.project-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.project-table th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+.task-list {
+  padding-left: 18px;
+  margin: 0;
+}
+
+.task-list li {
+  list-style: disc;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+}
+
+select, button {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button {
+  background-color: #007acc;
+  color: white;
+  border: none;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background-color: #005fa3;
+}
+
+.delete-btn {
+  background-color: #e74c3c;
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
+}

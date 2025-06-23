@@ -1,0 +1,46 @@
+<div class="container">
+  <p class="success" *ngIf="message">{{ message }}</p>
+  <p class="error" *ngIf="error">{{ error }}</p>
+
+  <h2>All Projects</h2>
+  <table class="project-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Project Name</th>
+        <th>Tasks</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let project of projects; let i = index">
+        <!-- <td>{{ project.id }}</td> -->
+          <td>{{ i + 1 }}</td>
+        <td>{{ project.name }}</td>
+        <td>
+          <ul class="task-list">
+            <li *ngFor="let task of project.tasks">{{ task.name }}</li>
+          </ul>
+        </td>
+        <td>
+          <button (click)="deleteProject(project.id!)" class="delete-btn">🗑 Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Assign Task to Project</h3>
+  <div class="form">
+    <select [(ngModel)]="selectedTaskId" name="taskId">
+      <option [value]="null" disabled selected>Select Task</option>
+      <option *ngFor="let task of tasks" [value]="task.id">{{ task.name }}</option>
+    </select>
+
+    <select [(ngModel)]="selectedProjectIdForAssignment" name="projectId">
+      <option [value]="null" disabled selected>Select Project</option>
+      <option *ngFor="let project of projects" [value]="project.id">{{ project.name }}</option>
+    </select>
+
+    <button (click)="assignTaskToProject()">Assign</button>
+  </div>
+</div>

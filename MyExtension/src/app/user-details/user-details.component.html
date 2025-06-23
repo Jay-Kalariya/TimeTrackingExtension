@@ -1,0 +1,51 @@
+<h2 *ngIf="userInfo" class="page-title">Task History for {{ userInfo.username }}</h2>
+
+<div class="toolbar">
+  <input
+    type="text"
+    placeholder="Search task..."
+    [(ngModel)]="searchTerm"
+    class="search-input"
+  />
+
+  <button (click)="goToAdminDashboard()" class="btn-back">← Back to Admin</button>
+</div>
+
+<div *ngIf="errorMessage" class="error-message">
+  <p>{{ errorMessage }}</p>
+</div>
+
+<div *ngIf="getMonthKeys().length === 0 && !errorMessage" class="empty-state">
+  <p>No task history found for this user.</p>
+</div>
+
+<!-- Task History Grouped by Month -->
+<div class="month-section" *ngFor="let month of getMonthKeys()">
+  <h3 class="month-title">{{ month }}</h3>
+
+  <table *ngIf="getFilteredTasksForMonth(month).length > 0" class="task-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Task Name</th>
+        <th>Total Duration</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of getFilteredTasksForMonth(month); trackBy: trackByTask">
+        <td>{{ item.date }}</td>
+        <td>{{ item.taskName }}</td>
+        <td>{{ item.totalDuration }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="monthly-summary">
+    <strong>Monthly Total: {{ formatDuration(monthlyTotals[month]) }}</strong>
+  </div>
+</div>
+
+<!-- Optional: Total Lunch Break Duration -->
+<div *ngIf="lunchBreakTotal" class="lunch-summary">
+  <strong>Total Lunch Break Time: {{ lunchBreakTotal }}</strong>
+</div>

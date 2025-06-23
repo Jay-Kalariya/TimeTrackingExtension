@@ -1,0 +1,43 @@
+<div class="task-history-container">
+  <h2>My Task History</h2>
+
+  <label class="filter-label">
+    Date:
+    <input type="date" [(ngModel)]="filterDate" (change)="onFilterChange()" />
+  </label>
+
+  <div class="table-wrapper" *ngIf="filteredHistory.length > 0">
+    <table class="task-table">
+      <thead>
+        <tr>
+          <th>Task Name</th>
+          <th>Start Time</th>
+          <th>End Time</th>
+          <th>Duration</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let entry of filteredHistory">
+          <td>{{ entry.taskName }}</td>
+          <td>{{ entry.startTime | date: 'short' }}</td>
+          <td>{{ entry.endTime | date: 'short' }}</td>
+          <td>{{ formatDuration(entry.duration) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
+      Prev
+    </button>
+    <span>Page {{ currentPage }} of {{ totalPages }}</span>
+    <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
+      Next
+    </button>
+  </div>
+
+  <div *ngIf="filteredHistory.length === 0" class="no-data">
+    No task history found for this date.
+  </div>
+</div>

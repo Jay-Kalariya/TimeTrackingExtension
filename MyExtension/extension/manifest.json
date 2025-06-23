@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Time Tracking Extension",
+  "description": "Time tracking Chrome extension for Angular App",
+  "version": "1.0",
+  "permissions": ["storage", "tabs"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+      "default_title": "Time Tracker"
+  },
+  "host_permissions": [
+    "http://localhost:5236/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["index.html", "**/*.js", "**/*.css" ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

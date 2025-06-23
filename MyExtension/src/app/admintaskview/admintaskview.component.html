@@ -1,0 +1,67 @@
+<div class="task-container">
+  <div class="header">
+    <h2>All Tasks</h2>
+    <div class="task-controls">
+      <span class="task-count">Total: {{ tasks.length }}</span>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Loading tasks...</div>
+
+  <!-- Task Table -->
+  <div class="table-wrapper" *ngIf="!isLoading">
+    <table class="task-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Task Name</th>
+          <th>Assigned Users</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let task of tasks; let i = index">
+          <!-- <td>{{ task.id }}</td> -->
+            <td>{{ i + 1 }}</td>
+          <td>{{ task.name }}</td>
+          <td>
+            <div class="assigned-users">
+              <span *ngFor="let user of task.assignedUsers" class="user-badge">
+                {{ user.username }}
+                <button (click)="unassignTask(task.id, user.id)" class="unassign-btn">×</button>
+              </span>
+              <select (change)="onUserSelect($event, task.id)" class="user-select">
+                <option value="">Assign User</option>
+                <option *ngFor="let user of users" [value]="user.id">{{ user.username }}</option>
+              </select>
+            </div>
+          </td>
+          <td>
+            <button class="btn btn-edit" (click)="editTask(task)">Edit</button>
+            <button class="btn btn-delete" (click)="deleteTask(task.id)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Edit Modal --><!-- Modal Test -->
+<!-- Put this outside any parent container like .task-container -->
+<div *ngIf="editingTaskId !== null" class="modal-backdrop">
+  <div class="modal">
+    <button class="close-btn" (click)="cancelEdit()">×</button>
+    <h3>Edit Task</h3>
+
+    <form [formGroup]="taskForm" (ngSubmit)="updateTask()">
+      <label for="taskName">Task Name</label>
+      <input id="taskName" formControlName="name" placeholder="Task name" />
+
+      <div class="modal-actions">
+        <button type="submit" class="btn primary">Save</button>
+        <button type="button" class="btn secondary" (click)="cancelEdit()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+

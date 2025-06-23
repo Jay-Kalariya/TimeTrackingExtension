@@ -1,0 +1,80 @@
+
+<div *ngIf="isLoggedIn" class="dashboard-container">
+  <h2>User Dashboard</h2>
+
+  <div class="task-select">
+    <label for="task">Select Task:</label>
+    <select
+      id="task"
+      (change)="selectTask($event)"
+      [disabled]="
+        nonWorkingPeriodActive &&
+        !['Lunch', 'Break', 'Day Off'].includes(selectedTask?.name ?? '')
+      "
+    >
+      <option value="" disabled selected>Select a task</option>
+      <option *ngFor="let task of tasks" [value]="task.id">
+        {{ task.name }}
+      </option>
+    </select>
+  </div>
+
+  <div class="timer-display">
+    <h3>Timer: {{ formatTime() }}</h3>
+    <div *ngIf="selectedTask">
+      <h4>Current Task: {{ selectedTask.name }}</h4>
+    </div>
+  </div>
+
+ <div class="button-group">
+  <!-- Show Push and Stop only for working tasks -->
+  <ng-container *ngIf="selectedTask && !['Break', 'Lunch', 'Day Off'].includes(selectedTask.name)">
+    <button
+      (click)="pushTask()"
+      [disabled]="showStartButton || nonWorkingPeriodActive || !selectedTask"
+    >
+      Push
+    </button>
+
+    <button
+      (click)="stopTask()"
+      [disabled]="nonWorkingPeriodActive || !selectedTask"
+    >
+      Stop
+    </button>
+
+    <button
+      (click)="resumeTask()"
+      *ngIf="showStartButton"
+      [disabled]="nonWorkingPeriodActive"
+    >
+      ResumeTask
+    </button>
+  </ng-container>
+
+  <!-- Show ending buttons for breaks or day off -->
+  <ng-container *ngIf="selectedTask && ['Break', 'Lunch', 'Day Off'].includes(selectedTask.name)">
+    <button (click)="stopCurrentBreak()">
+      {{ selectedTask.name === 'Break' ? 'Break Over' : selectedTask.name === 'Lunch' ? 'Lunch Break Over' : 'Day Off Over' }}
+    </button>
+  </ng-container>
+
+  <!-- <button
+    (click)="dayOff()"
+    [disabled]="nonWorkingPeriodActive || selectedTask?.name === 'Day Off'"
+  >
+    Day Off
+  </button> -->
+
+  <button (click)="goToUserHistory()">View My History</button>
+</div>
+ 
+</div>
+
+<div *ngIf="!isLoggedIn" class="not-logged-in">
+  <p>Please login to access the dashboard.</p>
+</div>
+
+
+
+

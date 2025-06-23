@@ -1,0 +1,17 @@
+/* Ensure full viewport height */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+  height: 100%;
+  width: 100%;
+}
+
+app-root {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
