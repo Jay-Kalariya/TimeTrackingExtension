@@ -2,6 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../modals/user.modals';
+import { environment } from '../../environments/environment.prod';
+
+
 
 export interface Task {
   id: number;
@@ -19,16 +22,9 @@ export interface TaskAssignmentDto {
 
 @Injectable({ providedIn: 'root' })
 export class AdminTaskService {
-  private apiUrl: string;
+ private apiUrl = `${environment.apiBaseUrl}/AdminTask`;
 
-  constructor(private http: HttpClient) {
-    const isLocal = window.location.hostname === 'localhost';
-    const baseUrl = isLocal
-      ? 'http://localhost:5236'
-      : 'https://timetrackingextension-3.onrender.com';
-    this.apiUrl = `${baseUrl}/api/AdminTask`;
-  }
-
+constructor(private http: HttpClient) {}
 
   getAllTasks(): Observable<Task[]> {
     return this.http.get<Task[]>(this.apiUrl);

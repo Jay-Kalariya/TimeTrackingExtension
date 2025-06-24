@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment.prod';
 
 export interface Project {
   id?: number;
@@ -13,15 +14,9 @@ export interface Project {
   providedIn: 'root'
 })
 export class ProjectService {
- private baseUrl: string;
+  private baseUrl = `${environment.apiBaseUrl}/Project`;
 
-constructor(private http: HttpClient) {
-  const isLocal = window.location.hostname === 'localhost';
-  const rootUrl = isLocal
-    ? 'http://localhost:5236'
-    : 'https://timetrackingextension-3.onrender.com';
-  this.baseUrl = `${rootUrl}/api/Project`;
-}
+constructor(private http: HttpClient) {}
 
   createProject(project: Project): Observable<Project> {
     return this.http.post<Project>(`${this.baseUrl}`, project);

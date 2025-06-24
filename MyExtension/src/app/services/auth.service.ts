@@ -1,21 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { jwtDecode } from 'jwt-decode';
+import { environment } from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl :string;
-  private tokenKey = 'token';
 
-  constructor(private http: HttpClient) {
-    const isLocal = window.location.hostname === 'localhost';
-    const baseUrl = isLocal
-      ? 'http://localhost:5236'
-      : 'https://timetrackingextension-3.onrender.com';
-    this.apiUrl = `${baseUrl}/api/Auth`;
-  }
+private apiUrl = `${environment.apiBaseUrl}/Auth`;
+private tokenKey = 'token';
+
+constructor(private http: HttpClient) {}
+
 
 
   login(credentials: { email: string; password: string }) {

@@ -1,21 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
-  private apiUrl: string;// URL of your .NET backend
+   private apiUrl: string;
 
-  
   constructor(private http: HttpClient) {
-    // Dynamically set the base URL based on the hostname or extension context
-    const isLocal = window.location.hostname === 'localhost';
-    this.apiUrl = isLocal
-      ? 'http://localhost:5236' // Local .NET backend
-      : 'https://timetrackingextension-3.onrender.com'; // Live backend
+    this.apiUrl = environment.apiBaseUrl;
   }
+
 
   // Helper method to get token from chrome.storage.local
   private getTokenFromStorage(): Promise<string | null> {
