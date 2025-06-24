@@ -42,7 +42,7 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
             "http://localhost:4200", // Angular local
-            "https://time-tracking-jay-kalariya-projects.vercel.app/#/login", // ✅ Your Netlify frontend
+            "https://time-tracking-jay-kalariya-projects.vercel.app", // ✅ Your Netlify frontend
             "chrome-extension://noedcggpeiiilpolnlleicbknicgfkaj" // Chrome extension
         )
         .AllowAnyOrigin()
