@@ -1,20 +1,25 @@
-# Use official .NET 9 SDK image to build
+# Use official .NET SDK image to build
 FROM mcr.microsoft.com/dotnet/sdk:9.0-preview AS build
-WORKDIR /app
+WORKDIR /src
 
-# Copy everything and restore dependencies
-COPY . ./
+# Copy everything into the container
+COPY . .
+
+# Set working directory to where the .csproj file is
+WORKDIR /src/Dotnet1
+
+# Restore and publish
 RUN dotnet restore
-RUN dotnet publish -c Release -o out
+RUN dotnet publish -c Release -o /app/out
 
-# Use the ASP.NET runtime to run the app
+# Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-preview
 WORKDIR /app
 COPY --from=build /app/out .
 
-# Expose port and set environment variable
-EXPOSE 80
+# Set environment and port
 ENV ASPNETCORE_URLS=http://+:80
+EXPOSE 80
 
-# Run the application
+# Start the app
 ENTRYPOINT ["dotnet", "Dotnet1.dll"]
