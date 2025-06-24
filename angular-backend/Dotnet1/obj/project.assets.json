@@ -3068,19 +3068,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Jay\\.nuget\\packages\\": {}
+    "C:\\Users\\Dell\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Jay\\Pictures\\TimeTrackingExtension\\angular-backend\\Dotnet1\\Dotnet1.csproj",
+      "projectUniqueName": "C:\\Users\\Dell\\Desktop\\TimeTrackingExtension\\angular-backend\\Dotnet1\\Dotnet1.csproj",
       "projectName": "Dotnet1",
-      "projectPath": "C:\\Users\\Jay\\Pictures\\TimeTrackingExtension\\angular-backend\\Dotnet1\\Dotnet1.csproj",
-      "packagesPath": "C:\\Users\\Jay\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Jay\\Pictures\\TimeTrackingExtension\\angular-backend\\Dotnet1\\obj\\",
+      "projectPath": "C:\\Users\\Dell\\Desktop\\TimeTrackingExtension\\angular-backend\\Dotnet1\\Dotnet1.csproj",
+      "packagesPath": "C:\\Users\\Dell\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Dell\\Desktop\\TimeTrackingExtension\\angular-backend\\Dotnet1\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Jay\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Dell\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -3104,7 +3104,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.300"
+      "SdkAnalysisLevel": "9.0.200"
     },
     "frameworks": {
       "net9.0": {
@@ -3156,7 +3156,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
