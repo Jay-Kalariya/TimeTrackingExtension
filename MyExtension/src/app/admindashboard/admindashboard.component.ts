@@ -18,6 +18,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AdminTaskService, Task } from '../services/admin-task.service';
 import { ProjectService, Project } from '../services/project.service';
+import { environment } from '../../environments/environment.prod';
 
 interface User {
   id: number;
@@ -82,7 +83,7 @@ ngOnInit(): void {
   // USER CRUD
   fetchUsers(): void {
     this.getAuthHeaders((headers) => {
-      this.http.get<User[]>('http://localhost:5236/api/User', { headers }).subscribe({
+      this.http.get<User[]>(`${environment.apiBaseUrl}/User`, { headers }).subscribe({
         next: (res) => this.users = res,
         error: (err) => console.error('Error fetching users', err)
       });
@@ -100,10 +101,10 @@ ngOnInit(): void {
           role: data.role
         };
 
-        this.http.put(`http://localhost:5236/api/User/${this.editingUserId}`, updateData, { headers }).subscribe(() => {
+        this.http.put(`${environment.apiBaseUrl}/User/${this.editingUserId}`, updateData, { headers }).subscribe(() => {
           if (data.newPassword && data.newPassword.trim() !== '') {
             this.http.put(
-              `http://localhost:5236/api/User/${this.editingUserId}/password`,
+              `${environment.apiBaseUrl}/User/${this.editingUserId}/password`,
               { newPassword: data.newPassword },
               { headers }
             ).subscribe({
@@ -119,7 +120,7 @@ ngOnInit(): void {
           }
         });
       } else {
-        this.http.post('http://localhost:5236/api/auth/register', data, { headers }).subscribe(() => {
+        this.http.post(`${environment.apiBaseUrl}/auth/register`, data, { headers }).subscribe(() => {
           this.fetchUsers();
           this.resetForm();
         });
@@ -130,7 +131,7 @@ ngOnInit(): void {
   deleteUser(userId: number): void {
     if (confirm('Are you sure you want to delete this user?')) {
       this.getAuthHeaders((headers) => {
-        this.http.delete(`http://localhost:5236/api/User/${userId}`, { headers }).subscribe(() => {
+        this.http.delete(`${environment.apiBaseUrl}/User/${userId}`, { headers }).subscribe(() => {
           this.fetchUsers();
         });
       });

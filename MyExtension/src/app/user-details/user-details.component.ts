@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
+import { environment } from '../../environments/environment.prod';
 @Component({
   selector: 'app-user-details',
   imports: [FormsModule, CommonModule],
@@ -43,12 +43,12 @@ export class UserDetailsComponent implements OnInit {
         }
         const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
-        this.http.get(`http://localhost:5236/api/User/${this.userId}`, { headers }).subscribe({
+        this.http.get(`${environment.apiBaseUrl}/User/${this.userId}`, { headers }).subscribe({
           next: data => this.userInfo = data,
           error: () => this.errorMessage = 'Failed to load user info.'
         });
 
-        this.http.get<any[]>(`http://localhost:5236/api/task/admin/history/${this.userId}`, { headers }).subscribe({
+        this.http.get<any[]>(`${environment.apiBaseUrl}/task/admin/history/${this.userId}`, { headers }).subscribe({
           next: data => {
             this.breakHistory = data.filter(t => t.taskName === 'Lunch' || t.taskName === 'Day Off');
             this.taskHistory = data.filter(t => !(t.taskName === 'Lunch' || t.taskName === 'Day Off'));
