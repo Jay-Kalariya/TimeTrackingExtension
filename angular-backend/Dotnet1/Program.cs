@@ -45,7 +45,6 @@ builder.Services.AddCors(options =>
             "https://time-tracking-jay-kalariya-projects.vercel.app", // ✅ Your Netlify frontend
             "chrome-extension://noedcggpeiiilpolnlleicbknicgfkaj" // Chrome extension
         )
-        .AllowAnyOrigin()
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials();
