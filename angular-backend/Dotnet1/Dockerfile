@@ -9,8 +9,8 @@ COPY . .
 WORKDIR /src/Dotnet1
 
 # Restore and publish the application
-RUN dotnet restore
-RUN dotnet publish -c Release -o /app/out
+RUN dotnet restore Dotnet1.csproj
+RUN dotnet publish Dotnet1.csproj -c Release -o /app/out
 
 # Build the runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-preview
