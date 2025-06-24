@@ -41,15 +41,16 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAngularAndChromeExtension", policy =>
     {
         policy.WithOrigins(
-            "http://localhost:4200", // Local Angular
-            "https://timetrackingextension-3.onrender.com", // Hosted Angular or extension
-            "chrome-extension://noedcggpeiiilpolnlleicbknicgfkaj" // Chrome Extension
+            "http://localhost:4200", // Angular local
+            "https://melodious-youtiao-564e08.netlify.app", // ✅ Your Netlify frontend
+            "chrome-extension://noedcggpeiiilpolnlleicbknicgfkaj" // Chrome extension
         )
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials();
     });
 });
+
 
 // 6. JWT Authentication Setup
 builder.Services.AddAuthentication(options =>
