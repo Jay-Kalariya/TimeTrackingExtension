@@ -19,9 +19,16 @@ export interface TaskAssignmentDto {
 
 @Injectable({ providedIn: 'root' })
 export class AdminTaskService {
-  private apiUrl = 'http://localhost:5236/api/AdminTask';
+  private apiUrl: string;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    const isLocal = window.location.hostname === 'localhost';
+    const baseUrl = isLocal
+      ? 'http://localhost:5236'
+      : 'https://timetrackingextension-3.onrender.com';
+    this.apiUrl = `${baseUrl}/api/AdminTask`;
+  }
+
 
   getAllTasks(): Observable<Task[]> {
     return this.http.get<Task[]>(this.apiUrl);

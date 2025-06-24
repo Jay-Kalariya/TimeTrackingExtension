@@ -20,8 +20,15 @@ export interface TaskSessionDto {
 
 @Injectable({ providedIn: 'root' })
 export class TaskService {
-  private apiUrl = 'http://localhost:5236/api/Task';
-  constructor(private http: HttpClient) { }
+ private apiUrl: string;
+
+constructor(private http: HttpClient) {
+  const isLocal = window.location.hostname === 'localhost';
+  const rootUrl = isLocal
+    ? 'http://localhost:5236'
+    : 'https://timetrackingextension-3.onrender.com';
+  this.apiUrl = `${rootUrl}/api/Task`;
+}
 
 
 

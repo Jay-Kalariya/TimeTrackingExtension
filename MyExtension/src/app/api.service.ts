@@ -6,9 +6,16 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ApiService {
-  private apiUrl = 'http://localhost:5236';  // URL of your .NET backend
+  private apiUrl: string;// URL of your .NET backend
 
-  constructor(private http: HttpClient) { }
+  
+  constructor(private http: HttpClient) {
+    // Dynamically set the base URL based on the hostname or extension context
+    const isLocal = window.location.hostname === 'localhost';
+    this.apiUrl = isLocal
+      ? 'http://localhost:5236' // Local .NET backend
+      : 'https://timetrackingextension-3.onrender.com'; // Live backend
+  }
 
   // Helper method to get token from chrome.storage.local
   private getTokenFromStorage(): Promise<string | null> {

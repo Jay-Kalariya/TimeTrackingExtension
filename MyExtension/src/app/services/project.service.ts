@@ -13,9 +13,15 @@ export interface Project {
   providedIn: 'root'
 })
 export class ProjectService {
-  private baseUrl = 'http://localhost:5236/api/Project'; // ✅ Updated base URL
+ private baseUrl: string;
 
-  constructor(private http: HttpClient) {}
+constructor(private http: HttpClient) {
+  const isLocal = window.location.hostname === 'localhost';
+  const rootUrl = isLocal
+    ? 'http://localhost:5236'
+    : 'https://timetrackingextension-3.onrender.com';
+  this.baseUrl = `${rootUrl}/api/Project`;
+}
 
   createProject(project: Project): Observable<Project> {
     return this.http.post<Project>(`${this.baseUrl}`, project);

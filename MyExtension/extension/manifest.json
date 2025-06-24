@@ -11,7 +11,8 @@
       "default_title": "Time Tracker"
   },
   "host_permissions": [
-    "http://localhost:5236/*"
+    "http://localhost:5236/*",
+     "https://timetrackingextension-3.onrender.com/*"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"

@@ -1,49 +1,57 @@
-// using Dotnet1.Data;
 using Dotnet1;
 using Dotnet1.Services;
+using Dotnet1.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.AspNetCore.Cors;
-using Dotnet1.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Configuration from appsettings.json
+// Load configuration from appsettings.json
 var configuration = builder.Configuration;
 
-// Register DbContext (replace with your MySQL connection string)
+// 1. Register MySQL DbContext
 builder.Services.AddDbContext<TimeTrackingContext>(options =>
     options.UseMySql(configuration.GetConnectionString("DefaultConnection"),
         new MySqlServerVersion(new Version(8, 0, 36))));
 
-
-
-
-// Register custom services
+// 2. Register application services
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<TaskService>();
 builder.Services.AddScoped<AdminTaskService>();
 builder.Services.AddScoped<ProjectService>();
 
-// Enable controllers
-builder.Services.AddControllers();
+// 3. Register controllers
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.WriteIndented = true;
+    });
 
-// Enable Swagger
+// 4. Enable Swagger in development only
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// 5. Configure CORS for Angular & Chrome Extension (both local + hosted)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngularAndChromeExtension",
-        policy => policy.WithOrigins("chrome-extension://noedcggpeiiilpolnlleicbknicgfkaj", "http://localhost:4200")  // Allow both Chrome extension and Angular app
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials());
+    options.AddPolicy("AllowAngularAndChromeExtension", policy =>
+    {
+        policy.WithOrigins(
+            "http://localhost:4200", // Local Angular
+            "https://timetrackingextension-3.onrender.com", // Hosted Angular or extension
+            "chrome-extension://noedcggpeiiilpolnlleicbknicgfkaj" // Chrome Extension
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
+    });
 });
 
-// Configure JWT Authentication
+// 6. JWT Authentication Setup
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -65,21 +73,15 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-    options.JsonSerializerOptions.WriteIndented = true;
-});
-
+// 7. Add Authorization
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-
+// 8. Auto-seed admin user if not exists
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<TimeTrackingContext>();
-
     if (!db.Users.Any(u => u.Role == "Admin"))
     {
         var admin = new User
@@ -89,29 +91,26 @@ using (var scope = app.Services.CreateScope())
             PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
             Role = "Admin"
         };
-
         db.Users.Add(admin);
         db.SaveChanges();
         Console.WriteLine("✅ Admin user seeded: admin@example.com / Admin@123");
     }
 }
 
-
-
-// Middleware pipeline
+// 9. Middleware Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// NOTE: Do NOT use HTTPS redirection in Render (it already uses HTTPS)
+// app.UseHttpsRedirection(); // ❌ Removed
 
 app.UseCors("AllowAngularAndChromeExtension");
 
-
-app.UseAuthentication(); // Use JWT authentication
-app.UseAuthorization();  // Use role-based authorization
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

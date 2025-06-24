@@ -6,10 +6,17 @@ import { jwtDecode } from 'jwt-decode';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:5236/api/Auth';
+  private apiUrl :string;
   private tokenKey = 'token';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    const isLocal = window.location.hostname === 'localhost';
+    const baseUrl = isLocal
+      ? 'http://localhost:5236'
+      : 'https://timetrackingextension-3.onrender.com';
+    this.apiUrl = `${baseUrl}/api/Auth`;
+  }
+
 
   login(credentials: { email: string; password: string }) {
     return this.http.post<{ token: string }>(`${this.apiUrl}/login`, credentials);
