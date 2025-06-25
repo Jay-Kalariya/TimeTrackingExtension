@@ -17,10 +17,12 @@ namespace Dotnet1.Controllers
         private readonly TimeTrackingContext _context;
         private readonly TaskService _taskService;
 
-        public AdminTaskController(AdminTaskService service,  TaskService taskService,TimeTrackingContext context)
+        public AdminTaskController(AdminTaskService service, TaskService taskService, TimeTrackingContext context)
         {
             _service = service;
+              _taskService = taskService;
             _context = context;
+            
         }
 
         [HttpGet]
