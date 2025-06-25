@@ -4,6 +4,7 @@ import { UserService } from '../services/user.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { User } from '../modals/user.modals';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-admintaskview',
@@ -22,7 +23,8 @@ export class AdmintaskviewComponent implements OnInit {
   constructor(
     private taskService: AdminTaskService,
     private userService: UserService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private toastr: ToastrService
   ) {
     this.taskForm = this.fb.group({
       name: ['']
@@ -35,14 +37,14 @@ export class AdmintaskviewComponent implements OnInit {
 
   loadInitialData(): void {
     this.isLoading = true;
-    
+
     this.userService.getAllUsers().subscribe({
       next: (users) => {
         this.users = users;
         this.loadTasks();
       },
       error: (err) => {
-        console.error('Failed to load users', err);
+        this.toastr.error('Failed to load users', 'Error');
         this.isLoading = false;
       }
     });
@@ -60,8 +62,8 @@ export class AdmintaskviewComponent implements OnInit {
         }));
         this.loadAssignments();
       },
-      error: (err) => {
-        console.error('Failed to load tasks', err);
+      error: () => {
+        this.toastr.error('Failed to load tasks', 'Error');
         this.isLoading = false;
       }
     });
@@ -73,49 +75,50 @@ export class AdmintaskviewComponent implements OnInit {
         assignments.forEach(assignment => {
           const task = this.tasks.find(t => t.id === assignment.taskId);
           const user = this.users.find(u => u.id === assignment.userId);
-          
+
           if (task && user && !task.assignedUsers.some(u => u.id === user.id)) {
             task.assignedUsers.push(user);
           }
         });
         this.isLoading = false;
       },
-      error: (err) => {
-        console.error('Failed to load assignments', err);
+      error: () => {
+        this.toastr.error('Failed to load assignments', 'Error');
         this.isLoading = false;
       }
     });
   }
 
- editTask(task: Task): void {
-  console.log('Editing task:', task); // already there
-  this.editingTaskId = task.id;
-  console.log('editingTaskId set to:', this.editingTaskId); // Add this
-  this.taskForm.patchValue({ name: task.name || '' });
-}
-
-updateTask(): void {
-  if (this.editingTaskId !== null) {
-    const { name } = this.taskForm.getRawValue();
-    if (!name || !name.trim()) {
-      alert("Task name can't be empty");
-      return;
-    }
-
-    const updatedTask: Task = {
-      id: this.editingTaskId,
-      name
-    };
-
-    this.taskService.updateTask(this.editingTaskId, updatedTask).subscribe({
-      next: () => {
-        this.loadTasks();
-        this.cancelEdit();
-      },
-      error: () => alert('Failed to update task')
-    });
+  editTask(task: Task): void {
+    this.editingTaskId = task.id;
+    this.taskForm.patchValue({ name: task.name || '' });
   }
-}
+
+  updateTask(): void {
+    if (this.editingTaskId !== null) {
+      const { name } = this.taskForm.getRawValue();
+      if (!name || !name.trim()) {
+        this.toastr.warning("Task name can't be empty", 'Validation');
+        return;
+      }
+
+      const updatedTask: Task = {
+        id: this.editingTaskId,
+        name
+      };
+
+      this.taskService.updateTask(this.editingTaskId, updatedTask).subscribe({
+        next: () => {
+          this.toastr.success('Task updated successfully', 'Success');
+          this.loadTasks();
+          this.cancelEdit();
+        },
+        error: () => {
+          this.toastr.error('Failed to update task', 'Error');
+        }
+      });
+    }
+  }
 
   cancelEdit(): void {
     this.editingTaskId = null;
@@ -125,8 +128,13 @@ updateTask(): void {
   deleteTask(taskId: number): void {
     if (confirm('Are you sure you want to delete this task?')) {
       this.taskService.deleteTask(taskId).subscribe({
-        next: () => this.loadTasks(),
-        error: () => alert('Failed to delete task')
+        next: () => {
+          this.toastr.success('Task deleted successfully', 'Success');
+          this.loadTasks();
+        },
+        error: () => {
+          this.toastr.error('Failed to delete task', 'Error');
+        }
       });
     }
   }
@@ -136,18 +144,26 @@ updateTask(): void {
     if (!isNaN(userId)) {
       this.taskService.assignTask({ taskId, userId }).subscribe({
         next: () => {
+          this.toastr.success('User assigned to task', 'Success');
           this.loadAssignments();
           (event.target as HTMLSelectElement).value = '';
         },
-        error: () => alert('Failed to assign task')
+        error: () => {
+          this.toastr.error('Failed to assign task', 'Error');
+        }
       });
     }
   }
 
   unassignTask(taskId: number, userId: number): void {
     this.taskService.unassignTask(taskId, userId).subscribe({
-      next: () => this.loadAssignments(),
-      error: () => alert('Failed to unassign task')
+      next: () => {
+        this.toastr.success('User unassigned from task', 'Success');
+        this.loadAssignments();
+      },
+      error: () => {
+        this.toastr.error('Failed to unassign task', 'Error');
+      }
     });
   }
 }

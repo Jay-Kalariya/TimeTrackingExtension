@@ -4,8 +4,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../environments/environment.prod';
+import { ToastrService } from 'ngx-toastr';
+
 @Component({
   selector: 'app-user-details',
+  standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './user-details.component.html',
   styleUrls: ['./user-details.component.css']
@@ -23,7 +26,12 @@ export class UserDetailsComponent implements OnInit {
   monthlyTaskHistory: { [month: string]: any[] } = {};
   monthlyTotals: { [month: string]: number } = {};
 
-  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private http: HttpClient,
+    private router: Router,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit(): void {
     this.userId = Number(this.route.snapshot.paramMap.get('id'));
@@ -38,14 +46,15 @@ export class UserDetailsComponent implements OnInit {
     this.getToken()
       .then(token => {
         if (!token) {
-          this.errorMessage = 'User not authenticated';
+          this.toastr.error('User not authenticated');
           return;
         }
+
         const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
         this.http.get(`${environment.apiBaseUrl}/User/${this.userId}`, { headers }).subscribe({
           next: data => this.userInfo = data,
-          error: () => this.errorMessage = 'Failed to load user info.'
+          error: () => this.toastr.error('Failed to load user info.')
         });
 
         this.http.get<any[]>(`${environment.apiBaseUrl}/task/admin/history/${this.userId}`, { headers }).subscribe({
@@ -56,11 +65,11 @@ export class UserDetailsComponent implements OnInit {
             this.aggregateTaskHistory();
             this.processBreaks();
           },
-          error: () => this.errorMessage = 'Failed to load task history.'
+          error: () => this.toastr.error('Failed to load task history.')
         });
       })
       .catch(() => {
-        this.errorMessage = 'Authentication error.';
+        this.toastr.error('Authentication error.');
       });
   }
 
@@ -73,7 +82,7 @@ export class UserDetailsComponent implements OnInit {
       const start = new Date(task.startTime);
       const end = new Date(task.endTime);
       const date = start.toISOString().split('T')[0];
-      const month = start.toLocaleString('default', { month: 'long', year: 'numeric' }); // e.g. "May 2025"
+      const month = start.toLocaleString('default', { month: 'long', year: 'numeric' });
       const key = `${date}_${task.taskName}`;
       const duration = (end.getTime() - start.getTime()) / 1000;
 
@@ -154,14 +163,11 @@ export class UserDetailsComponent implements OnInit {
     this.router.navigate(['/admindashboard']);
   }
 
-  // ** New function for filtering tasks by search term **
   getFilteredTasksForMonth(month: string) {
     if (!this.monthlyTaskHistory[month]) return [];
-
     if (!this.searchTerm) return this.monthlyTaskHistory[month];
 
     const term = this.searchTerm.toLowerCase();
-
     return this.monthlyTaskHistory[month].filter(task =>
       task.taskName.toLowerCase().includes(term)
     );

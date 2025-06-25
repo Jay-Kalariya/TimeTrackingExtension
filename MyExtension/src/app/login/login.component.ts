@@ -5,6 +5,7 @@ import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +18,11 @@ export class LoginComponent implements OnInit {
   credentials = { email: '', password: '' };
   errorMessage = '';
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit(): void {
     const isChromeExtension = typeof chrome !== 'undefined' && !!chrome.storage?.local;
@@ -28,6 +33,7 @@ export class LoginComponent implements OnInit {
         if (token) {
           this.auth.setToken(token);
           const role = this.auth.getRole();
+          this.toastr.success('Welcome back!', 'Auto-login successful');
           this.redirectBasedOnRole(role);
         }
       });
@@ -35,6 +41,7 @@ export class LoginComponent implements OnInit {
       const token = this.auth.getToken();
       if (token) {
         const role = this.auth.getRole();
+        this.toastr.success('Welcome back!', 'Auto-login successful');
         this.redirectBasedOnRole(role);
       }
     }
@@ -45,10 +52,12 @@ export class LoginComponent implements OnInit {
       next: (res: any) => {
         this.auth.setToken(res.token);
         const role = this.auth.getRole();
+        this.toastr.success('Login successful', 'Welcome');
         this.redirectBasedOnRole(role);
       },
       error: () => {
         this.errorMessage = 'Invalid email or password';
+        this.toastr.error('Invalid email or password', 'Login Failed');
       }
     });
   }

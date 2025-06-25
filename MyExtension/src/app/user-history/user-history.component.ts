@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { TaskService } from '../services/task.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-user-history',
-  imports:[FormsModule,CommonModule,ReactiveFormsModule],
+  imports: [FormsModule, CommonModule, ReactiveFormsModule],
   templateUrl: './user-history.component.html',
   styleUrls: ['./user-history.component.css']
 })
@@ -17,7 +18,10 @@ export class UserHistoryComponent implements OnInit {
   totalPages = 0;
   filterDate: string = '';
 
-  constructor(private taskService: TaskService) {}
+  constructor(
+    private taskService: TaskService,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit(): void {
     this.taskService.getUserHistoryTask().subscribe({
@@ -25,7 +29,9 @@ export class UserHistoryComponent implements OnInit {
         this.userTaskHistory = data;
         this.applyFiltersAndPagination();
       },
-      error: () => alert('Failed to load user task history.')
+      error: () => {
+        this.toastr.error('Failed to load user task history.', 'Error');
+      }
     });
   }
 
@@ -67,12 +73,11 @@ export class UserHistoryComponent implements OnInit {
   }
 
   formatDuration(seconds: number | null | undefined): string {
-  if (typeof seconds !== 'number' || isNaN(seconds)) return '0h 0m 0s';
+    if (typeof seconds !== 'number' || isNaN(seconds)) return '0h 0m 0s';
 
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = Math.floor(seconds % 60); // ✅ Round down seconds
-  return `${h}h ${m}m ${s}s`;
-}
-
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    return `${h}h ${m}m ${s}s`;
+  }
 }

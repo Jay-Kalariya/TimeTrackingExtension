@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { TaskService } from '../services/task.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -22,28 +23,27 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
   resumeSeconds = 0;
   showStartButton = false;
   nonWorkingPeriodActive = false;
-  
 
-  constructor(private taskService: TaskService, private router: Router) {}
+  constructor(
+    private taskService: TaskService,
+    private router: Router,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit(): void {
     const token = localStorage.getItem('token');
     this.isLoggedIn = !!token;
-     this.loadDashboardTasks(); 
+    this.loadDashboardTasks();
     this.updateCurrentISTTime();
     setInterval(() => this.updateCurrentISTTime(), 1000);
   }
 
- loadDashboardTasks() {
+  loadDashboardTasks() {
     this.taskService.getTasksForDashboard().subscribe({
       next: (res) => {
         this.tasks = res;
-        console.log('Loaded tasks:', this.tasks); // Debug log
       },
-      error: (err) => {
-        console.error('Error loading tasks:', err);
-        alert('Failed to load tasks');
-      }
+      error: () => this.toastr.error('Failed to load tasks')
     });
   }
 
@@ -73,7 +73,7 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
     const newTask = this.tasks.find(t => t.id === newTaskId) || null;
 
     if (this.nonWorkingPeriodActive && newTask && !['Lunch', 'Break', 'Day Off'].includes(newTask.name)) {
-      alert('You cannot start a working task while on a break or day off.');
+      this.toastr.warning('You cannot start a working task while on a break or day off.');
       setTimeout(() => {
         target.value = this.selectedTask?.id.toString() ?? '';
       });
@@ -83,7 +83,7 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
     if (this.selectedTask && this.selectedTask.id !== newTaskId) {
       this.taskService.endTask().subscribe({
         next: () => this.startNewTask(newTask),
-        error: () => alert('Failed to end current task.')
+        error: () => this.toastr.error('Failed to end current task.')
       });
     } else {
       this.startNewTask(newTask);
@@ -94,7 +94,7 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
     if (!task) return;
 
     if (this.nonWorkingPeriodActive && !['Lunch', 'Break', 'Day Off'].includes(task.name)) {
-      alert('You cannot start a working task while on a break or day off.');
+      this.toastr.warning('You cannot start a working task while on a break or day off.');
       return;
     }
 
@@ -106,10 +106,9 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
         this.showStartButton = false;
         this.startTimer();
         this.nonWorkingPeriodActive = ['Lunch', 'Break', 'Day Off'].includes(task.name);
+        this.toastr.success(`${task.name} started`);
       },
-      error: (err) => {
-        alert(err.error?.message || 'Failed to start the task.');
-      }
+      error: (err) => this.toastr.error(err.error?.message || 'Failed to start the task.')
     });
   }
 
@@ -130,55 +129,51 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
   }
 
   pushTask() {
-  this.taskService.endTask().subscribe({
-    next: () => {
-      alert('Task pushed!');
-      this.stopTimer();
+    this.taskService.endTask().subscribe({
+      next: () => {
+        this.toastr.success('Task pushed!');
+        this.stopTimer();
+        this.resumeSeconds = this.seconds;
+        this.showStartButton = true;
+        this.nonWorkingPeriodActive = false;
+      },
+      error: () => this.toastr.error('Failed to push the task.')
+    });
+  }
 
-      this.resumeSeconds = this.seconds;
-      this.showStartButton = true;
+  resumeTask() {
+    if (!this.selectedTask) return;
 
-      // ❌ Don't clear selectedTask — keep it so "Start" shows
-      // ✅ This will allow Start button to appear for the same task
-      // this.selectedTask = null;
-
-      this.nonWorkingPeriodActive = false;
-    },
-    error: () => alert('Failed to push the task.')
-  });
-}
- resumeTask() {
-  if (!this.selectedTask) return;
-
-  this.taskService.startTask(this.selectedTask.id).subscribe({
-    next: () => {
-      this.seconds = this.resumeSeconds;
-      this.startTimer();
-      this.showStartButton = false;
-    },
-    error: () => alert('Failed to resume task.')
-  });
-}
+    this.taskService.startTask(this.selectedTask.id).subscribe({
+      next: () => {
+        this.seconds = this.resumeSeconds;
+        this.startTimer();
+        this.showStartButton = false;
+        this.toastr.success('Task resumed');
+      },
+      error: () => this.toastr.error('Failed to resume task.')
+    });
+  }
 
   stopCurrentBreak() {
     if (this.selectedTask && ['Lunch', 'Break', 'Day Off'].includes(this.selectedTask.name)) {
       this.taskService.endTask().subscribe({
         next: () => {
-          alert(`${this.selectedTask?.name} ended`);
+          this.toastr.success(`${this.selectedTask?.name} ended`);
           this.nonWorkingPeriodActive = false;
           this.stopTimer();
           this.seconds = 0;
           this.selectedTask = null;
           this.showStartButton = false;
         },
-        error: () => alert('Failed to end break.')
+        error: () => this.toastr.error('Failed to end break.')
       });
     }
   }
 
   dayOff() {
     if (this.nonWorkingPeriodActive) {
-      alert('You already have an active break or day off.');
+      this.toastr.warning('You already have an active break or day off.');
       return;
     }
 
@@ -187,35 +182,34 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
 
     this.taskService.startTask(dayOffTask.id).subscribe({
       next: () => {
-        alert('Marked as Day Off');
+        this.toastr.success('Marked as Day Off');
         this.stopTimer();
         this.seconds = 0;
         this.selectedTask = dayOffTask;
         this.showStartButton = false;
         this.nonWorkingPeriodActive = true;
       },
-      error: () => alert('Failed to mark Day Off.')
+      error: () => this.toastr.error('Failed to mark Day Off.')
     });
   }
 
- stopTask() {
-  if (this.selectedTask) {
-    this.taskService.endTask().subscribe({
-      next: () => {
-        alert('Task stopped and saved.');
-        this.stopTimer();
-        this.seconds = 0;
-        this.selectedTask = null;
-        this.showStartButton = false;
-        this.nonWorkingPeriodActive = false;
-      },
-      error: () => alert('Failed to stop task.')
-    });
-  } else {
-    alert('No active task.');
+  stopTask() {
+    if (this.selectedTask) {
+      this.taskService.endTask().subscribe({
+        next: () => {
+          this.toastr.success('Task stopped and saved.');
+          this.stopTimer();
+          this.seconds = 0;
+          this.selectedTask = null;
+          this.showStartButton = false;
+          this.nonWorkingPeriodActive = false;
+        },
+        error: () => this.toastr.error('Failed to stop task.')
+      });
+    } else {
+      this.toastr.info('No active task.');
+    }
   }
-}
-
 
   formatTime(): string {
     const h = Math.floor(this.seconds / 3600);

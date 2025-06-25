@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
-import { ApiService } from '../api.service';  // Import your API service
+import { ApiService } from '../api.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
-  imports:[FormsModule,CommonModule],
+  standalone: true,
+  imports: [FormsModule, CommonModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
@@ -17,22 +19,23 @@ export class RegisterComponent {
     email: '',
     password: ''
   };
-  errorMessage = '';
-  successMessage = '';
 
-  constructor(private apiService: ApiService, private router: Router) {}
+  constructor(
+    private apiService: ApiService,
+    private router: Router,
+    private toastr: ToastrService
+  ) {}
 
   onRegister(): void {
-    this.apiService.register(this.registerData).subscribe(
-      (response) => {
-        console.log('Registration successful!', response);
-        this.successMessage = 'Registration successful! You can now login.';
-        this.registerData = { username: '', email: '', password: '' };  // Clear form
+    this.apiService.register(this.registerData).subscribe({
+      next: (response) => {
+        this.toastr.success('🎉 Registration successful! You can now login.', 'Success');
+        this.registerData = { username: '', email: '', password: '' }; // Reset form
       },
-      (error) => {
-        this.errorMessage = 'Registration failed, please try again!';
-        console.error('Registration failed', error);
+      error: (err) => {
+        this.toastr.error('❌ Registration failed. Please try again.', 'Error');
+        console.error('Registration failed', err);
       }
-    );
+    });
   }
 }
