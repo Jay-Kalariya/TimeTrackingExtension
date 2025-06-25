@@ -110,6 +110,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowAngularAndChromeExtension");
 
+app.UseRouting(); // ✅ Add this
 app.UseAuthentication();
 app.UseAuthorization();
 
