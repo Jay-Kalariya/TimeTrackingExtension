@@ -21,7 +21,6 @@ export interface TaskAssignmentDto {
 }
 
 
-
 @Injectable({ providedIn: 'root' })
 export class AdminTaskService {
  private apiUrl = `${environment.apiBaseUrl}/AdminTask`;
@@ -63,4 +62,8 @@ constructor(private http: HttpClient) {}
   getTasksForUser(userId: number): Observable<Task[]> {
     return this.http.get<Task[]>(`${this.apiUrl}/user/${userId}`);
   }
+
+    getAllUserStatuses(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/status/all-users`);
+}
 }
