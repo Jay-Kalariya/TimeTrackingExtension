@@ -44,6 +44,7 @@
     'status-logged': getUserStatus(user.id),
     'status-missing': !getUserStatus(user.id)
   }">
+  
               {{ getUserStatus(user.id) ? '✔ Logged' : '❌ Not Logged' }}
             </span>
           </td>
