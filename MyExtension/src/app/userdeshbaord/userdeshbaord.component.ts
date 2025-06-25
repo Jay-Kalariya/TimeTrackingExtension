@@ -23,6 +23,7 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
   resumeSeconds = 0;
   showStartButton = false;
   nonWorkingPeriodActive = false;
+  hasLoggedToday: boolean = false;
 
   constructor(
     private taskService: TaskService,
@@ -35,6 +36,7 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
     this.isLoggedIn = !!token;
     this.loadDashboardTasks();
     this.updateCurrentISTTime();
+     this.checkLoggedStatus(); 
     setInterval(() => this.updateCurrentISTTime(), 1000);
   }
 
@@ -221,4 +223,17 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
   goToUserHistory() {
     this.router.navigate(['/user-history']);
   }
+
+  checkLoggedStatus(): void {
+  this.taskService.hasUserLoggedToday().subscribe({
+    next: (res) => {
+      this.hasLoggedToday = res.logged;
+    },
+    error: () => {
+      this.hasLoggedToday = false;
+      this.toastr.error('Failed to fetch logged status.');
+    }
+  });
+}
+
 }

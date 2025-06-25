@@ -11,13 +11,13 @@
     </div>
 
     <!-- MENU ICON AND DROPDOWN --><!-- Search bar + Dropdown -->
-   <div class="right-controls">
-    <input type="text" [(ngModel)]="searchTerm" placeholder="Search by username/email/role" />
-    <div class="view-buttons">
-      <button class="btn secondary" (click)="goviewproject()">📁 View Projects</button>
-      <button class="btn secondary" (click)="goviewtask()">📝 View All Tasks</button>
+    <div class="right-controls">
+      <input type="text" [(ngModel)]="searchTerm" placeholder="Search by username/email/role" />
+      <div class="view-buttons">
+        <button class="btn secondary" (click)="goviewproject()">📁 View Projects</button>
+        <button class="btn secondary" (click)="goviewtask()">📝 View All Tasks</button>
+      </div>
     </div>
-  </div>
 
   </div>
 
@@ -29,6 +29,7 @@
           <th>Username</th>
           <th>Email</th>
           <th>Role</th>
+          <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -38,6 +39,15 @@
           <td>{{ user.username }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.role }}</td>
+          <td>
+            <span [ngClass]="{
+    'status-logged': getUserStatus(user.id),
+    'status-missing': !getUserStatus(user.id)
+  }">
+              {{ getUserStatus(user.id) ? '✔ Logged' : '❌ Not Logged' }}
+            </span>
+          </td>
+
           <td>
             <button (click)="editUser(user)" class="btn small edit">Edit</button>
             <button (click)="deleteUser(user.id)" class="btn small delete">Delete</button>

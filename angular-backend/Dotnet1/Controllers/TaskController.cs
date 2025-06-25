@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Dotnet1.DTOs;
 using System.Security.Claims;
 
+
 namespace Dotnet1.Controllers
 {
     [Route("api/[controller]")]
@@ -14,11 +15,13 @@ namespace Dotnet1.Controllers
     {
         private readonly TaskService _taskService;
         private readonly AdminTaskService _adminTaskService;
+        private readonly TimeTrackingContext _context;
 
-        public TaskController(TaskService taskService, AdminTaskService adminTaskService)
+        public TaskController(TaskService taskService, AdminTaskService adminTaskService, TimeTrackingContext context)
         {
             _taskService = taskService;
             _adminTaskService = adminTaskService;
+            _context = context;
         }
 
         [HttpPost("start")]
@@ -126,5 +129,20 @@ namespace Dotnet1.Controllers
             var tasks = await _taskService.GetTasksForUserDashboardAsync(userId);
             return Ok(tasks);
         }
+
+
+        [HttpGet("status/my")]
+        public async Task<IActionResult> HasUserLoggedToday()
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var hasLogged = await _taskService.HasLoggedTaskTodayAsync(userId);
+            return Ok(new { logged = hasLogged });
+        }
+
+
+
     }
+
+
+
 }

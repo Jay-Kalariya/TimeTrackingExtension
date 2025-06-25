@@ -805,8 +805,14 @@ C:\Users\Jay\Pictures\TimeTrackingExtension\angular-backend\Dotnet1\obj\Debug\ne
 C:\Users\Jay\Pictures\TimeTrackingExtension\angular-backend\Dotnet1\obj\Debug\net9.0\Dotnet1.pdb
 C:\Users\Jay\Pictures\TimeTrackingExtension\angular-backend\Dotnet1\obj\Debug\net9.0\Dotnet1.genruntimeconfig.cache
 C:\Users\Jay\Pictures\TimeTrackingExtension\angular-backend\Dotnet1\obj\Debug\net9.0\ref\Dotnet1.dll
+C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\out\web.config
 C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\appsettings.Development.json
 C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\appsettings.json
+C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\out\appsettings.Development.json
+C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\out\appsettings.json
+C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\out\Dotnet1.deps.json
+C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\out\Dotnet1.runtimeconfig.json
+C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\out\Dotnet1.staticwebassets.endpoints.json
 C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\Dotnet1.staticwebassets.endpoints.json
 C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\Dotnet1.exe
 C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\Dotnet1.deps.json
@@ -923,9 +929,3 @@ C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\obj\Debug\ne
 C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\obj\Debug\net9.0\Dotnet1.pdb
 C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\obj\Debug\net9.0\Dotnet1.genruntimeconfig.cache
 C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\obj\Debug\net9.0\ref\Dotnet1.dll
-C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\out\web.config
-C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\out\appsettings.Development.json
-C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\out\appsettings.json
-C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\out\Dotnet1.deps.json
-C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\out\Dotnet1.runtimeconfig.json
-C:\Users\Dell\Desktop\TimeTrackingExtension\angular-backend\Dotnet1\bin\Debug\net9.0\out\Dotnet1.staticwebassets.endpoints.json

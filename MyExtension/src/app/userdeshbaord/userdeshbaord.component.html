@@ -2,6 +2,12 @@
 <div *ngIf="isLoggedIn" class="dashboard-container">
   <h2>User Dashboard</h2>
 
+  <div class="status-message">
+  <p [ngClass]="{ 'text-success': hasLoggedToday, 'text-danger': !hasLoggedToday }">
+    {{ hasLoggedToday ? '✅ You have logged your task today.' : '❌ You have not logged any task today.' }}
+  </p>
+</div>
+
   <div class="task-select">
     <label for="task">Select Task:</label>
     <select

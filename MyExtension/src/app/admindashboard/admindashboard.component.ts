@@ -25,6 +25,13 @@ interface User {
   role: string;
 }
 
+interface UserStatus {
+  id: number;
+  username: string;
+  email: string;
+  loggedToday: boolean;
+}
+
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
@@ -38,6 +45,8 @@ export class AdminDashboardComponent implements OnInit {
   projectForm: FormGroup;
 
   users: User[] = [];
+  userStatuses: UserStatus[] = [];
+
   searchTerm = '';
   editingUserId: number | null = null;
   showUserModal = false;
@@ -73,6 +82,7 @@ export class AdminDashboardComponent implements OnInit {
   ngOnInit(): void {
     this.ngZone.run(() => {
       this.fetchUsers();
+      this.fetchStatuses(); // ✅ Load status on init
     });
   }
 
@@ -86,6 +96,25 @@ export class AdminDashboardComponent implements OnInit {
         }
       });
     });
+  }
+
+  fetchStatuses(): void {
+    this.getAuthHeaders((headers) => {
+      this.http.get<UserStatus[]>(`${environment.apiBaseUrl}/AdminTask/status/all-users`, { headers }).subscribe({
+        next: (data) => {
+          this.userStatuses = data;
+        },
+        error: (err) => {
+          console.error('Failed to fetch user statuses', err);
+          this.toastr.error('Error loading user statuses', 'Error');
+        }
+      });
+    });
+  }
+
+  getUserStatus(userId: number): boolean {
+    const status = this.userStatuses.find(u => u.id === userId);
+    return status?.loggedToday ?? false;
   }
 
   onSubmit(): void {

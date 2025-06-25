@@ -1,5 +1,6 @@
 using Dotnet1.Models;
 using Microsoft.EntityFrameworkCore;
+
 using Dotnet1.DTOs;
 
 namespace Dotnet1.Services
@@ -23,56 +24,56 @@ namespace Dotnet1.Services
             return await _context.Users.AnyAsync(u => u.Id == userId);
         }
 
-   public async Task<TaskSession> StartTaskAsync(int userId, int taskId)
-{
-    // ✅ Get current active session
-    var activeSession = await _context.TaskSessions
-        .FirstOrDefaultAsync(t => t.UserId == userId && t.EndTime == null);
-
-    if (activeSession != null)
-    {
-        if (activeSession.TaskId == taskId)
+        public async Task<TaskSession> StartTaskAsync(int userId, int taskId)
         {
-            // 🚫 Already working on this task – just return current session
-            return activeSession;
-        }
+            // ✅ Get current active session
+            var activeSession = await _context.TaskSessions
+                .FirstOrDefaultAsync(t => t.UserId == userId && t.EndTime == null);
 
-        // ✅ End current active session (different task)
-        activeSession.EndTime = DateTime.UtcNow;
-        await _context.SaveChangesAsync();
-    }
+            if (activeSession != null)
+            {
+                if (activeSession.TaskId == taskId)
+                {
+                    // 🚫 Already working on this task – just return current session
+                    return activeSession;
+                }
 
-    // 🔄 Check if last session of this task ended within 5 min (allow resume)
-    var lastSession = await _context.TaskSessions
-        .Where(t => t.UserId == userId && t.TaskId == taskId && t.EndTime != null)
-        .OrderByDescending(t => t.EndTime)
-        .FirstOrDefaultAsync();
+                // ✅ End current active session (different task)
+                activeSession.EndTime = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+            }
 
-    if (lastSession != null)
-    {
-        var timeSinceEnd = DateTime.UtcNow - lastSession.EndTime.Value;
+            // 🔄 Check if last session of this task ended within 5 min (allow resume)
+            var lastSession = await _context.TaskSessions
+                .Where(t => t.UserId == userId && t.TaskId == taskId && t.EndTime != null)
+                .OrderByDescending(t => t.EndTime)
+                .FirstOrDefaultAsync();
 
-        if (timeSinceEnd.TotalMinutes <= 5)
-        {
-            lastSession.EndTime = null; // ✅ Resume session
+            if (lastSession != null)
+            {
+                var timeSinceEnd = DateTime.UtcNow - lastSession.EndTime.Value;
+
+                if (timeSinceEnd.TotalMinutes <= 5)
+                {
+                    lastSession.EndTime = null; // ✅ Resume session
+                    await _context.SaveChangesAsync();
+                    return lastSession;
+                }
+            }
+
+            // 🆕 Start new session
+            var newSession = new TaskSession
+            {
+                UserId = userId,
+                TaskId = taskId,
+                StartTime = DateTime.UtcNow,
+                EndTime = null
+            };
+
+            _context.TaskSessions.Add(newSession);
             await _context.SaveChangesAsync();
-            return lastSession;
+            return newSession;
         }
-    }
-
-    // 🆕 Start new session
-    var newSession = new TaskSession
-    {
-        UserId = userId,
-        TaskId = taskId,
-        StartTime = DateTime.UtcNow,
-        EndTime = null
-    };
-
-    _context.TaskSessions.Add(newSession);
-    await _context.SaveChangesAsync();
-    return newSession;
-}
 
 
         public async Task<bool> EndCurrentTaskAsync(int userId)
@@ -155,5 +156,19 @@ namespace Dotnet1.Services
 
             return assignedTasks.Union(defaultTasks).ToList();
         }
+
+
+        public async Task<bool> HasLoggedTaskTodayAsync(int userId)
+        {
+            var todayStart = DateTime.UtcNow.Date;
+            var todayEnd = todayStart.AddDays(1);
+
+            return await _context.TaskSessions.AnyAsync(ts =>
+                ts.UserId == userId &&
+                ts.StartTime >= todayStart &&
+                ts.StartTime < todayEnd
+            );
+        }
+
     }
 }

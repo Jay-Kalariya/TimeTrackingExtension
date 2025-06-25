@@ -3,6 +3,7 @@ using Dotnet1.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using DotnetTask = Dotnet1.Models.Task;
 
 namespace Dotnet1.Controllers
@@ -13,10 +14,13 @@ namespace Dotnet1.Controllers
     public class AdminTaskController : ControllerBase
     {
         private readonly AdminTaskService _service;
+        private readonly TimeTrackingContext _context;
+        private readonly TaskService _taskService;
 
-        public AdminTaskController(AdminTaskService service)
+        public AdminTaskController(AdminTaskService service,  TaskService taskService,TimeTrackingContext context)
         {
             _service = service;
+            _context = context;
         }
 
         [HttpGet]
@@ -36,13 +40,13 @@ namespace Dotnet1.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<DotnetTask>>> GetTasksForCurrentUser()
         {
-            try 
+            try
             {
                 var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
                 var tasks = await _service.GetTasksForUserAsync(userId);
                 return Ok(tasks);
             }
-            catch (Exception )
+            catch (Exception)
             {
                 return StatusCode(500, "Internal server error");
             }
@@ -82,7 +86,8 @@ namespace Dotnet1.Controllers
             if (assignment == null)
                 return BadRequest("Invalid user or task.");
 
-            return Ok(new {
+            return Ok(new
+            {
                 TaskId = assignment.TaskId,
                 UserId = assignment.UserId,
                 Message = "Task assigned successfully"
@@ -101,6 +106,31 @@ namespace Dotnet1.Controllers
         {
             var success = await _service.UnassignTaskAsync(taskId, userId);
             return success ? NoContent() : NotFound("Assignment not found.");
+        }
+        
+        
+        [HttpGet("status/all-users")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllUserStatuses()
+        {
+            var today = DateTime.UtcNow.Date;
+            var users = await _context.Users.ToListAsync();
+
+            var statuses = new List<object>();
+
+            foreach (var user in users)
+            {
+                var hasLogged = await _taskService.HasLoggedTaskTodayAsync(user.Id);
+                statuses.Add(new
+                {
+                    user.Id,
+                    user.Username,
+                    user.Email,
+                    LoggedToday = hasLogged
+                });
+            }
+
+            return Ok(statuses);
         }
     }
 }

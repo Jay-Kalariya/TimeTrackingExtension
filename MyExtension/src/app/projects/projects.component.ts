@@ -36,12 +36,19 @@ export class ProjectComponent implements OnInit {
     });
   }
 
-  loadTasks() {
-    this.taskService.getAllTasks().subscribe({
-      next: (res) => this.tasks = res,
-      error: () => this.toastr.error('❌ Failed to load tasks', 'Error')
-    });
-  }
+loadTasks() {
+  this.taskService.getAllTasks().subscribe({
+    next: (res) => {
+      // Convert name to lowercase and trim whitespace to match exactly
+      this.tasks = res.filter(task => {
+        const name = task.name.toLowerCase().trim();
+        return !['lunch', 'break', 'day off'].includes(name);
+      });
+      console.log('Filtered tasks:', this.tasks.map(t => t.name)); // Debug
+    },
+    error: () => this.toastr.error('❌ Failed to load tasks', 'Error')
+  });
+}
 
   assignTaskToProject() {
     if (!this.selectedTaskId || !this.selectedProjectIdForAssignment) {

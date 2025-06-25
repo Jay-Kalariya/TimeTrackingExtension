@@ -68,5 +68,12 @@ constructor(private http: HttpClient) {}
   getTasksForDashboard(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/dashboard-tasks`);
   }
+  getAllUserStatuses(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/status/all-users`);
+}
+
+hasUserLoggedToday(): Observable<{ logged: boolean }> {
+  return this.http.get<{ logged: boolean }>(`${this.apiUrl}/status/my`);
+}
 }
 

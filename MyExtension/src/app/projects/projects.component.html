@@ -30,10 +30,10 @@
 
   <h3>Assign Task to Project</h3>
   <div class="form">
-    <select [(ngModel)]="selectedTaskId" name="taskId">
-      <option [value]="null" disabled selected>Select Task</option>
-      <option *ngFor="let task of tasks" [value]="task.id">{{ task.name }}</option>
-    </select>
+   <select [(ngModel)]="selectedTaskId" name="taskId">
+  <option [value]="null" disabled selected>Select Task</option>
+  <option *ngFor="let task of tasks" [value]="task.id">{{ task.name }}</option>
+</select>
 
     <select [(ngModel)]="selectedProjectIdForAssignment" name="projectId">
       <option [value]="null" disabled selected>Select Project</option>
