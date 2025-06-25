@@ -19,8 +19,8 @@
       <tbody>
         <tr *ngFor="let entry of filteredHistory">
           <td>{{ entry.taskName }}</td>
-          <td>{{ entry.startTime | date: 'short' }}</td>
-          <td>{{ entry.endTime | date: 'short' }}</td>
+          <td>{{ convertToIST(entry.startTime) }}</td>
+          <td>{{ convertToIST(entry.endTime) }}</td>
           <td>{{ formatDuration(entry.duration) }}</td>
         </tr>
       </tbody>

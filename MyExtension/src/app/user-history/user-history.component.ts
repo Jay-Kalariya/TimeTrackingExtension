@@ -80,4 +80,20 @@ export class UserHistoryComponent implements OnInit {
     const s = Math.floor(seconds % 60);
     return `${h}h ${m}m ${s}s`;
   }
+
+  // ✅ Convert date to IST display format
+  convertToIST(dateString: string): string {
+    const date = new Date(dateString);
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    const istDate = new Date(date.getTime() + istOffset);
+    return istDate.toLocaleString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour12: true
+    });
+  }
 }
