@@ -78,8 +78,8 @@ getUserProfile(): Observable<any> {
   const headers = {
     Authorization: `Bearer ${localStorage.getItem('token')}`
   };
-  return this.http.get(`${this.apiUrl}/Auth/profile`, { headers });
-  
+  // Directly use the auth endpoint, not under /Task
+  return this.http.get(`https://timetrackingextension.onrender.com/api/Auth/profile`, { headers });
 }
 }
 
