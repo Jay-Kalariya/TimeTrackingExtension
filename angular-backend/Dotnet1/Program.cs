@@ -109,16 +109,7 @@ if (app.Environment.IsDevelopment())
 // NOTE: Do NOT use HTTPS redirection in Render (it already uses HTTPS)
 // app.UseHttpsRedirection(); // ❌ Removed
 app.UseRouting(); // ✅ Add this
-// Preflight handler
-app.Use(async (context, next) =>
-{
-    if (context.Request.Method == "OPTIONS")
-    {
-        context.Response.StatusCode = 200;
-        return;
-    }
-    await next();
-});
+
 app.UseCors("AllowAngularAndChromeExtension");
 
 app.UseAuthentication();
