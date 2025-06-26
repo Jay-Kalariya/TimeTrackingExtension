@@ -73,5 +73,9 @@ constructor(private http: HttpClient) {}
 hasUserLoggedToday(): Observable<{ logged: boolean }> {
   return this.http.get<{ logged: boolean }>(`${this.apiUrl}/status/my`);
 }
+
+getUserProfile(): Observable<any> {
+  return this.http.get(`${this.apiUrl}/auth/profile`);
+}
 }
 

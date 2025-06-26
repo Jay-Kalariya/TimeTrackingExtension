@@ -24,19 +24,23 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
   showStartButton = false;
   nonWorkingPeriodActive = false;
   hasLoggedToday: boolean = false;
+  username: string = '';
 
   constructor(
     private taskService: TaskService,
     private router: Router,
     private toastr: ToastrService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const token = localStorage.getItem('token');
     this.isLoggedIn = !!token;
+    if (this.isLoggedIn) {
+      this.getUserProfile(); // ⬅️ Add this call
+    }
     this.loadDashboardTasks();
     this.updateCurrentISTTime();
-     this.checkLoggedStatus(); 
+    this.checkLoggedStatus();
     setInterval(() => this.updateCurrentISTTime(), 1000);
   }
 
@@ -225,15 +229,28 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
   }
 
   checkLoggedStatus(): void {
-  this.taskService.hasUserLoggedToday().subscribe({
-    next: (res) => {
-      this.hasLoggedToday = res.logged;
-    },
-    error: () => {
-      this.hasLoggedToday = false;
-      this.toastr.error('Failed to fetch logged status.');
-    }
-  });
-}
+    this.taskService.hasUserLoggedToday().subscribe({
+      next: (res) => {
+        this.hasLoggedToday = res.logged;
+      },
+      error: () => {
+        this.hasLoggedToday = false;
+        this.toastr.error('Failed to fetch logged status.');
+      }
+    });
+
+
+  }
+
+  getUserProfile() {
+    this.taskService.getUserProfile().subscribe({
+      next: (res) => {
+        this.username = res.username; // adjust key if backend sends something else
+      },
+      error: () => {
+        this.toastr.error('Failed to fetch user profile');
+      }
+    });
+  }
 
 }
