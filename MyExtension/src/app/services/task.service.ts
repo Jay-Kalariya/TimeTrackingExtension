@@ -79,6 +79,7 @@ getUserProfile(): Observable<any> {
     Authorization: `Bearer ${localStorage.getItem('token')}`
   };
   return this.http.get(`${this.apiUrl}/Auth/profile`, { headers });
+  
 }
 }
 
