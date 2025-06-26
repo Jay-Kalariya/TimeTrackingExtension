@@ -81,3 +81,9 @@ button:hover {
 .text-danger {
   color: red;
 }
+
+.name{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
