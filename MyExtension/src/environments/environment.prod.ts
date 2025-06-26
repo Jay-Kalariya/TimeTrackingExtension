@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://timetrackingextension-3.onrender.com/api'
+  apiBaseUrl: 'https://timetrackingextension.onrender.com/api'
 };
