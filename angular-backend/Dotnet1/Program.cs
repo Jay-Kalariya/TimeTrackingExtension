@@ -40,14 +40,15 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularAndChromeExtension", policy =>
     {
-        policy.WithOrigins(
-            "http://localhost:4200", // Angular local
-            "https://time-tracking-jay-kalariya-projects.vercel.app", // ✅ Your Netlify frontend
-            "chrome-extension://noedcggpeiiilpolnlleicbknicgfkaj" // Chrome extension
-        )
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-         .AllowCredentials(); // ✅ OK now
+        policy
+            .WithOrigins(
+                "http://localhost:4200",
+                "https://time-tracking-jay-kalariya-projects.vercel.app",
+                "chrome-extension://noedcggpeiiilpolnlleicbknicgfkaj"
+            )
+            .WithHeaders("Content-Type", "Authorization")
+            .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            .AllowCredentials();
     });
 });
 
@@ -107,25 +108,19 @@ if (app.Environment.IsDevelopment())
 
 // NOTE: Do NOT use HTTPS redirection in Render (it already uses HTTPS)
 // app.UseHttpsRedirection(); // ❌ Removed
-
-app.UseCors("AllowAngularAndChromeExtension");
+app.UseRouting(); // ✅ Add this
+// Preflight handler
 app.Use(async (context, next) =>
 {
     if (context.Request.Method == "OPTIONS")
     {
-        context.Response.Headers.Add("Access-Control-Allow-Origin", "https://time-tracking-jay-kalariya-projects.vercel.app");
-        context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
         context.Response.StatusCode = 200;
-        await context.Response.CompleteAsync();
         return;
     }
-
     await next();
 });
+app.UseCors("AllowAngularAndChromeExtension");
 
-app.UseRouting(); // ✅ Add this
 app.UseAuthentication();
 app.UseAuthorization();
 

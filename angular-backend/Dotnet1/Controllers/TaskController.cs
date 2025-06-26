@@ -129,8 +129,7 @@ namespace Dotnet1.Controllers
             var tasks = await _taskService.GetTasksForUserDashboardAsync(userId);
             return Ok(tasks);
         }
-
-
+        
         [HttpGet("status/my")]
         public async Task<IActionResult> HasUserLoggedToday()
         {
@@ -138,11 +137,5 @@ namespace Dotnet1.Controllers
             var hasLogged = await _taskService.HasLoggedTaskTodayAsync(userId);
             return Ok(new { logged = hasLogged });
         }
-
-
-
     }
-
-
-
 }
