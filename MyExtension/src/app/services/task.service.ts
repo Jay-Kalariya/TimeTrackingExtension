@@ -75,7 +75,10 @@ hasUserLoggedToday(): Observable<{ logged: boolean }> {
 }
 
 getUserProfile(): Observable<any> {
-  return this.http.get(`${this.apiUrl}/auth/profile`);
+  const headers = {
+    Authorization: `Bearer ${localStorage.getItem('token')}`
+  };
+  return this.http.get(`${this.apiUrl}/Auth/profile`, { headers });
 }
 }
 
