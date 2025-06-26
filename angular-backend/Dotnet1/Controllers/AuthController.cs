@@ -22,10 +22,6 @@ namespace Dotnet1.Controllers
         }
 
 
-        public AuthController(AuthService authService)
-        {
-            _authService = authService;
-        }
 
         // POST api/auth/register
         [HttpPost("register")]
