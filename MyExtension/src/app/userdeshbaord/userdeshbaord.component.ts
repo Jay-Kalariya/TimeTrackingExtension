@@ -63,7 +63,7 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
         this.selectedTask = this.tasks.find(t => t.id === activeTask.taskId) || null;
 
         if (this.selectedTask) {
-          const startTime = new Date(activeTask.startTime); // ⬅️ This is in UTC
+          const startTime = new Date(Date.parse(activeTask.startTime)); // ⬅️ This is in UTC
           const now = new Date(); // Also UTC
           
           // ✅ Make sure both are treated as UTC (they already are in JavaScript)
@@ -89,7 +89,8 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
 
   updateCurrentISTTime() {
     const nowUTC = new Date();
-    const istOffset = 5.5 * 60 * 60 * 1000;
+  try{
+      const istOffset = 5.5 * 60 * 60 * 1000;
     const istTime = new Date(nowUTC.getTime() + istOffset);
     this.currentISTTime = istTime.toLocaleString('en-IN', {
       hour: 'numeric',
@@ -101,6 +102,11 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
       year: 'numeric',
       timeZone: 'Asia/Kolkata',
     });
+  }
+    catch (err) {
+    console.error('Failed to format IST time', err);
+    this.currentISTTime = new Date().toLocaleTimeString(); // fallback
+  }
   }
 
   selectTask(event: Event) {
