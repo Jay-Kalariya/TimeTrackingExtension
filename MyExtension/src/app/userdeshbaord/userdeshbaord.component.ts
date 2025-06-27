@@ -56,16 +56,21 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
   }
 
 
-  fetchActiveTask() {
+ fetchActiveTask() {
   this.taskService.getActiveTask().subscribe({
     next: (activeTask) => {
       if (activeTask && activeTask.taskId && activeTask.startTime) {
         this.selectedTask = this.tasks.find(t => t.id === activeTask.taskId) || null;
 
         if (this.selectedTask) {
-          const startTime = new Date(activeTask.startTime);
-          const now = new Date();
-          this.seconds = Math.floor((now.getTime() - startTime.getTime()) / 1000); // ✅ Real time passed
+          const startTime = new Date(activeTask.startTime); // ⬅️ This is in UTC
+          const now = new Date(); // Also UTC
+          
+          // ✅ Make sure both are treated as UTC (they already are in JavaScript)
+          const elapsedSeconds = Math.floor((now.getTime() - startTime.getTime()) / 1000);
+
+          // ❗ Clamp to 0 if somehow negative due to clock skew
+          this.seconds = elapsedSeconds > 0 ? elapsedSeconds : 0;
 
           this.startTimer();
           this.showStartButton = false;
