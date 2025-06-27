@@ -138,7 +138,7 @@ namespace Dotnet1.Controllers
             return Ok(new { logged = hasLogged });
         }
 
-        [HttpGet("active")]
+        [HttpGet("task/active")]
         public async Task<IActionResult> GetActiveTask()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));

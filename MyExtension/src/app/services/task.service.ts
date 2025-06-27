@@ -89,7 +89,7 @@ getUserProfile(): Observable<any> {
 }
 
 getActiveTask() {
-  return this.http.get<any>(`${this.apiUrl}/Task/active`, {
+  return this.http.get<any>(`${this.apiUrl}/task/active`, {
     headers: this.getAuthHeaders()
   });
 }
