@@ -39,7 +39,6 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
       this.getUserProfile(); // ⬅️ Add this call
     }
     this.checkLoggedStatus();
-
     this.loadDashboardTasks();
     this.updateCurrentISTTime();
     setInterval(() => this.updateCurrentISTTime(), 1000);
