@@ -24,6 +24,12 @@ export class TaskService {
 private apiUrl = `${environment.apiBaseUrl}/Task`;
 
 constructor(private http: HttpClient) {}
+ private getAuthHeaders() {
+    return {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json'
+    };
+  }
 
 
   startTask(taskTypeId: number) {
@@ -80,6 +86,12 @@ getUserProfile(): Observable<any> {
   };
   // Directly use the auth endpoint, not under /Task
   return this.http.get(`https://timetrackingextension.onrender.com/api/Auth/profile`, { headers });
+}
+
+getActiveTask() {
+  return this.http.get<any>(`${this.apiUrl}/task/active`, {
+    headers: this.getAuthHeaders()
+  });
 }
 }
 

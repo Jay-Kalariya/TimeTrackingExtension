@@ -19,6 +19,7 @@ namespace Dotnet1.Services
             return await _context.Tasks.ToListAsync();
         }
 
+
         public async Task<bool> UserExistsAsync(int userId)
         {
             return await _context.Users.AnyAsync(u => u.Id == userId);
@@ -169,6 +170,14 @@ namespace Dotnet1.Services
                 ts.StartTime < todayEnd
             );
         }
+
+        public async Task<TaskSession?> GetActiveTaskSessionAsync(int userId)
+        {
+            return await _context.TaskSessions
+                .Include(t => t.Task)
+                .FirstOrDefaultAsync(t => t.UserId == userId && t.EndTime == null);
+        }
+
 
     }
 }

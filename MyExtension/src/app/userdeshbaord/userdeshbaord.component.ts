@@ -48,8 +48,30 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
     this.taskService.getTasksForDashboard().subscribe({
       next: (res) => {
         this.tasks = res;
+         this.fetchActiveTask();
       },
       error: () => this.toastr.error('Failed to load tasks')
+    });
+  }
+
+
+   fetchActiveTask() {
+    this.taskService.getActiveTask().subscribe({
+      next: (activeTask) => {
+        if (activeTask && activeTask.taskId && activeTask.startTime) {
+          this.selectedTask = this.tasks.find(t => t.id === activeTask.taskId) || null;
+
+          if (this.selectedTask) {
+            const startTime = new Date(activeTask.startTime);
+            const now = new Date();
+            this.seconds = Math.floor((now.getTime() - startTime.getTime()) / 1000);
+            this.startTimer();
+            this.showStartButton = false;
+            this.nonWorkingPeriodActive = ['Lunch', 'Break', 'Day Off'].includes(this.selectedTask.name);
+          }
+        }
+      },
+      error: () => this.toastr.error('Failed to fetch active task')
     });
   }
 

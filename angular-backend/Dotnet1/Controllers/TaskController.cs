@@ -129,7 +129,7 @@ namespace Dotnet1.Controllers
             var tasks = await _taskService.GetTasksForUserDashboardAsync(userId);
             return Ok(tasks);
         }
-        
+
         [HttpGet("status/my")]
         public async Task<IActionResult> HasUserLoggedToday()
         {
@@ -137,5 +137,24 @@ namespace Dotnet1.Controllers
             var hasLogged = await _taskService.HasLoggedTaskTodayAsync(userId);
             return Ok(new { logged = hasLogged });
         }
+
+        [HttpGet("active")]
+        public async Task<IActionResult> GetActiveTask()
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var activeSession = await _taskService.GetActiveTaskSessionAsync(userId);
+
+            if (activeSession == null)
+                return Ok(null);
+
+            return Ok(new
+            {
+                taskId = activeSession.TaskId,
+                taskName = activeSession.Task?.Name,
+                startTime = activeSession.StartTime
+            });
+        }
+
     }
 }
