@@ -38,9 +38,10 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
     if (this.isLoggedIn) {
       this.getUserProfile(); // ⬅️ Add this call
     }
+    this.checkLoggedStatus();
+
     this.loadDashboardTasks();
     this.updateCurrentISTTime();
-    this.checkLoggedStatus();
     setInterval(() => this.updateCurrentISTTime(), 1000);
   }
 
@@ -55,25 +56,27 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
   }
 
 
-   fetchActiveTask() {
-    this.taskService.getActiveTask().subscribe({
-      next: (activeTask) => {
-        if (activeTask && activeTask.taskId && activeTask.startTime) {
-          this.selectedTask = this.tasks.find(t => t.id === activeTask.taskId) || null;
+  fetchActiveTask() {
+  this.taskService.getActiveTask().subscribe({
+    next: (activeTask) => {
+      if (activeTask && activeTask.taskId && activeTask.startTime) {
+        this.selectedTask = this.tasks.find(t => t.id === activeTask.taskId) || null;
 
-          if (this.selectedTask) {
-            const startTime = new Date(activeTask.startTime);
-            const now = new Date();
-            this.seconds = Math.floor((now.getTime() - startTime.getTime()) / 1000);
-            this.startTimer();
-            this.showStartButton = false;
-            this.nonWorkingPeriodActive = ['Lunch', 'Break', 'Day Off'].includes(this.selectedTask.name);
-          }
+        if (this.selectedTask) {
+          const startTime = new Date(activeTask.startTime);
+          const now = new Date();
+          this.seconds = Math.floor((now.getTime() - startTime.getTime()) / 1000); // ✅ Real time passed
+
+          this.startTimer();
+          this.showStartButton = false;
+          this.nonWorkingPeriodActive = ['Lunch', 'Break', 'Day Off'].includes(this.selectedTask.name);
         }
-      },
-      error: () => this.toastr.error('Failed to fetch active task')
-    });
-  }
+      }
+    },
+    error: () => this.toastr.error('Failed to fetch active task')
+  });
+}
+
 
   ngOnDestroy(): void {
     this.stopTimer();
