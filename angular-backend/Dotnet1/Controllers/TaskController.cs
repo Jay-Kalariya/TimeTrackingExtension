@@ -152,7 +152,7 @@ namespace Dotnet1.Controllers
             {
                 taskId = activeSession.TaskId,
                 taskName = activeSession.Task?.Name,
-                startTime = activeSession.StartTime
+                 startTime = activeSession.StartTime.ToUniversalTime().ToString("o")
             });
         }
 
