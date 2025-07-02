@@ -40,7 +40,7 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
     }
     this.checkLoggedStatus();
 
-
+    
      this.taskService.getTasksForDashboard().subscribe({
       next: (res) => {
         this.tasks = res;
@@ -62,7 +62,7 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
         this.selectedTask = this.tasks.find(t => t.id === activeTask.taskId) || null;
 
         if (this.selectedTask) {
-          const startTime = new Date(activeTask.startTime); // ⬅️ This is in UTC
+          const startTime = new Date(Date.parse(activeTask.startTime)); // ⬅️ This is in UTC
           const now = new Date(); // Also UTC
           
           // ✅ Make sure both are treated as UTC (they already are in JavaScript)
