@@ -39,20 +39,20 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
       this.getUserProfile(); // ⬅️ Add this call
     }
     this.checkLoggedStatus();
-    this.loadDashboardTasks();
-    this.updateCurrentISTTime();
-    setInterval(() => this.updateCurrentISTTime(), 1000);
-  }
 
-  loadDashboardTasks() {
-    this.taskService.getTasksForDashboard().subscribe({
+    
+     this.taskService.getTasksForDashboard().subscribe({
       next: (res) => {
         this.tasks = res;
          this.fetchActiveTask();
       },
       error: () => this.toastr.error('Failed to load tasks')
     });
+    this.updateCurrentISTTime();
+    setInterval(() => this.updateCurrentISTTime(), 1000);
   }
+
+ 
 
 
  fetchActiveTask() {
