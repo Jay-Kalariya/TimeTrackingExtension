@@ -11,7 +11,7 @@ namespace Dotnet1.Models
 
         public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }
-
+        
         [NotMapped]
         public double Duration => EndTime.HasValue ? (EndTime.Value - StartTime).TotalSeconds : 0;
 
