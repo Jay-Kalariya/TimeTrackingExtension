@@ -25,6 +25,7 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
   nonWorkingPeriodActive = false;
   hasLoggedToday: boolean = false;
   username: string = '';
+  private startTimestamp: Date | null = null; // ✅ added for accurate timer
 
   constructor(
     private taskService: TaskService,
@@ -36,51 +37,39 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
     const token = localStorage.getItem('token');
     this.isLoggedIn = !!token;
     if (this.isLoggedIn) {
-      this.getUserProfile(); // ⬅️ Add this call
+      this.getUserProfile();
     }
     this.checkLoggedStatus();
 
-    
-     this.taskService.getTasksForDashboard().subscribe({
+    this.taskService.getTasksForDashboard().subscribe({
       next: (res) => {
         this.tasks = res;
-         this.fetchActiveTask();
+        this.fetchActiveTask();
       },
       error: () => this.toastr.error('Failed to load tasks')
     });
+
     this.updateCurrentISTTime();
     setInterval(() => this.updateCurrentISTTime(), 1000);
   }
 
- 
+  fetchActiveTask() {
+    this.taskService.getActiveTask().subscribe({
+      next: (activeTask) => {
+        if (activeTask && activeTask.taskId && activeTask.startTime) {
+          this.selectedTask = this.tasks.find(t => t.id === activeTask.taskId) || null;
 
-
- fetchActiveTask() {
-  this.taskService.getActiveTask().subscribe({
-    next: (activeTask) => {
-      if (activeTask && activeTask.taskId && activeTask.startTime) {
-        this.selectedTask = this.tasks.find(t => t.id === activeTask.taskId) || null;
-
-        if (this.selectedTask) {
-          const startTime = new Date(Date.parse(activeTask.startTime)); // ⬅️ This is in UTC
-          const now = new Date(); // Also UTC
-          
-          // ✅ Make sure both are treated as UTC (they already are in JavaScript)
-          const elapsedSeconds = Math.floor((now.getTime() - startTime.getTime()) / 1000);
-
-          // ❗ Clamp to 0 if somehow negative due to clock skew
-          this.seconds = elapsedSeconds > 0 ? elapsedSeconds : 0;
-
-          this.startTimer();
-          this.showStartButton = false;
-          this.nonWorkingPeriodActive = ['Lunch', 'Break', 'Day Off'].includes(this.selectedTask.name);
+          if (this.selectedTask) {
+            this.startTimestamp = new Date(Date.parse(activeTask.startTime)); // ✅ UTC start time from backend
+            this.startTimer();
+            this.showStartButton = false;
+            this.nonWorkingPeriodActive = ['Lunch', 'Break', 'Day Off'].includes(this.selectedTask.name);
+          }
         }
-      }
-    },
-    error: () => this.toastr.error('Failed to fetch active task')
-  });
-}
-
+      },
+      error: () => this.toastr.error('Failed to fetch active task')
+    });
+  }
 
   ngOnDestroy(): void {
     this.stopTimer();
@@ -88,24 +77,44 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
 
   updateCurrentISTTime() {
     const nowUTC = new Date();
-  try{
+    try {
       const istOffset = 5.5 * 60 * 60 * 1000;
-    const istTime = new Date(nowUTC.getTime() + istOffset);
-    this.currentISTTime = istTime.toLocaleString('en-IN', {
-      hour: 'numeric',
-      minute: 'numeric',
-      second: 'numeric',
-      hour12: true,
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      timeZone: 'Asia/Kolkata',
-    });
+      const istTime = new Date(nowUTC.getTime() + istOffset);
+      this.currentISTTime = istTime.toLocaleString('en-IN', {
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        hour12: true,
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        timeZone: 'Asia/Kolkata',
+      });
+    } catch (err) {
+      console.error('Failed to format IST time', err);
+      this.currentISTTime = new Date().toLocaleTimeString();
+    }
   }
-    catch (err) {
-    console.error('Failed to format IST time', err);
-    this.currentISTTime = new Date().toLocaleTimeString(); // fallback
+
+  startTimer() {
+    this.stopTimer(); // clear previous interval
+
+    this.timer = setInterval(() => {
+      if (this.startTimestamp) {
+        const now = new Date();
+        const elapsedSeconds = Math.floor((now.getTime() - this.startTimestamp.getTime()) / 1000);
+        this.seconds = elapsedSeconds > 0 ? elapsedSeconds : 0;
+      }
+    }, 1000);
+    this.isPaused = false;
   }
+
+  stopTimer() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+    this.isPaused = true;
   }
 
   selectTask(event: Event) {
@@ -142,6 +151,7 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
     this.taskService.startTask(task.id).subscribe({
       next: () => {
         this.selectedTask = task;
+        this.startTimestamp = new Date(); // ✅ mark local start time for accurate calculation
         this.seconds = 0;
         this.resumeSeconds = 0;
         this.showStartButton = false;
@@ -151,22 +161,6 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
       },
       error: (err) => this.toastr.error(err.error?.message || 'Failed to start the task.')
     });
-  }
-
-  startTimer() {
-    this.stopTimer();
-    this.timer = setInterval(() => {
-      if (!this.isPaused) this.seconds++;
-    }, 1000);
-    this.isPaused = false;
-  }
-
-  stopTimer() {
-    if (this.timer) {
-      clearInterval(this.timer);
-      this.timer = null;
-    }
-    this.isPaused = true;
   }
 
   pushTask() {
@@ -187,7 +181,7 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
 
     this.taskService.startTask(this.selectedTask.id).subscribe({
       next: () => {
-        this.seconds = this.resumeSeconds;
+        this.startTimestamp = new Date(new Date().getTime() - this.resumeSeconds * 1000);
         this.startTimer();
         this.showStartButton = false;
         this.toastr.success('Task resumed');
@@ -212,28 +206,6 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  dayOff() {
-    if (this.nonWorkingPeriodActive) {
-      this.toastr.warning('You already have an active break or day off.');
-      return;
-    }
-
-    const dayOffTask = this.tasks.find(t => t.name === 'Day Off');
-    if (!dayOffTask) return;
-
-    this.taskService.startTask(dayOffTask.id).subscribe({
-      next: () => {
-        this.toastr.success('Marked as Day Off');
-        this.stopTimer();
-        this.seconds = 0;
-        this.selectedTask = dayOffTask;
-        this.showStartButton = false;
-        this.nonWorkingPeriodActive = true;
-      },
-      error: () => this.toastr.error('Failed to mark Day Off.')
-    });
-  }
-
   stopTask() {
     if (this.selectedTask) {
       this.taskService.endTask().subscribe({
@@ -244,6 +216,7 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
           this.selectedTask = null;
           this.showStartButton = false;
           this.nonWorkingPeriodActive = false;
+          this.startTimestamp = null;
         },
         error: () => this.toastr.error('Failed to stop task.')
       });
@@ -273,19 +246,16 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
         this.toastr.error('Failed to fetch logged status.');
       }
     });
-
-
   }
 
   getUserProfile() {
     this.taskService.getUserProfile().subscribe({
       next: (res) => {
-        this.username = res.username; // adjust key if backend sends something else
+        this.username = res.username;
       },
       error: () => {
         this.toastr.error('Failed to fetch user profile');
       }
     });
   }
-
 }

@@ -1,6 +1,5 @@
 using Dotnet1.Models;
 using Microsoft.EntityFrameworkCore;
-
 using Dotnet1.DTOs;
 
 namespace Dotnet1.Services
@@ -18,7 +17,6 @@ namespace Dotnet1.Services
         {
             return await _context.Tasks.ToListAsync();
         }
-
 
         public async Task<bool> UserExistsAsync(int userId)
         {

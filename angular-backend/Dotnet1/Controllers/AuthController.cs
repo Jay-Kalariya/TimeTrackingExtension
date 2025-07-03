@@ -21,8 +21,6 @@ namespace Dotnet1.Controllers
             _context = context;
         }
 
-
-
         // POST api/auth/register
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterDto registerDto)

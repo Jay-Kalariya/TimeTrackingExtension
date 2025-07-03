@@ -59,6 +59,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
+
 .AddJwtBearer(options =>
 {
     var secretKey = Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]!);
@@ -107,7 +108,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // NOTE: Do NOT use HTTPS redirection in Render (it already uses HTTPS)
-// app.UseHttpsRedirection(); // ❌ Removed
+// app.UseHttpsRedirection();
 app.UseRouting(); // ✅ Add this
 
 app.UseCors("AllowAngularAndChromeExtension");
