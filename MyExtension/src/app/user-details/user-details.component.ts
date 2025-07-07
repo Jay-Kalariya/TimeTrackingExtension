@@ -83,8 +83,8 @@ export class UserDetailsComponent implements OnInit {
     const monthTotals: { [month: string]: number } = {};
 
     for (const task of this.taskHistory) {
-      const start = new Date(task.startTime);
-       const end = task.endTime ? new Date(task.endTime) : new Date();
+      const start = new Date(Date.parse(task.startTime + 'Z'));
+      const end = task.endTime ? new Date(Date.parse(task.endTime + 'Z')) : new Date()
       const date = start.toISOString().split('T')[0];
       const month = start.toLocaleString('default', { month: 'long', year: 'numeric' });
       const key = `${date}_${task.taskName}`;
@@ -114,13 +114,13 @@ export class UserDetailsComponent implements OnInit {
           aggMap.set(key, { ...entry });
         }
       }
-     
-    this.monthlyTaskHistory[month] = Array.from(aggMap.values()).map(g => ({
-      ...g,
-      totalDuration: g.isInProgress
-        ? '⏳ In Progress'
-        : this.formatDuration(g.totalSeconds),
-    }));
+
+      this.monthlyTaskHistory[month] = Array.from(aggMap.values()).map(g => ({
+        ...g,
+        totalDuration: g.isInProgress
+          ? '⏳ In Progress'
+          : this.formatDuration(g.totalSeconds),
+      }));
     }
 
     this.monthlyTotals = monthTotals;
