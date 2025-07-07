@@ -18,6 +18,10 @@ export class ProjectComponent implements OnInit {
   selectedTaskId: number | null = null;
   selectedProjectIdForAssignment: number | null = null;
 
+   showEditModal: boolean = false;
+  editedProjectId: number | null = null;
+  editedProjectName: string = '';
+
   constructor(
     private projectService: ProjectService,
     private taskService: TaskService,
@@ -75,5 +79,35 @@ loadTasks() {
         error: () => this.toastr.error('❌ Delete failed', 'Error')
       });
     }
+  }
+
+
+    openModal(project: Project) {
+    this.editedProjectId = project.id!;
+    this.editedProjectName = project.name;
+    this.showEditModal = true;
+  }
+
+  closeModal() {
+    this.editedProjectId = null;
+    this.editedProjectName = '';
+    this.showEditModal = false;
+  }
+
+  saveEdit() {
+    if (!this.editedProjectName.trim()) {
+      this.toastr.warning('Project name cannot be empty');
+      return;
+    }
+
+    const updatedProject: Project = { name: this.editedProjectName };
+    this.projectService.updateProject(this.editedProjectId!, updatedProject).subscribe({
+      next: () => {
+        this.toastr.success('✅ Project updated!', 'Success');
+        this.loadProjects();
+        this.closeModal();
+      },
+      error: () => this.toastr.error('❌ Update failed', 'Error')
+    });
   }
 }

@@ -22,7 +22,8 @@
           </ul>
         </td>
         <td>
-          <button (click)="deleteProject(project.id!)" class="delete-btn">🗑 Delete</button>
+          <button (click)="openModal(project)" class="edit-btn"> Edit</button>
+          <button (click)="deleteProject(project.id!)" class="delete-btn"> Delete</button>
         </td>
       </tr>
     </tbody>
@@ -41,5 +42,16 @@
     </select>
 
     <button (click)="assignTaskToProject()">Assign</button>
+  </div>
+
+  <div class="modal-overlay" *ngIf="showEditModal">
+  <div class="modal">
+    <h3>Edit Project</h3>
+    <input [(ngModel)]="editedProjectName" placeholder="Enter new project name" />
+
+    <div class="modal-actions">
+      <button (click)="saveEdit()" class="save-btn">💾 Save</button>
+      <button (click)="closeModal()" class="cancel-btn">❌ Cancel</button>
+    </div>
   </div>
 </div>
