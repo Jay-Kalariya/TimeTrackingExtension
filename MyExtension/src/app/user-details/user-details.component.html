@@ -41,11 +41,15 @@
   </table>
 
   <div class="monthly-summary">
-    <strong>Monthly Total: {{ formatDuration(monthlyTotals[month]) }}</strong>
+    <strong>Monthly Total: {{ formatDuration(monthlyTotals[month]) }}</strong><br />
+    <span *ngIf="monthlyBreakTotals[month]">
+      💤 Break Time: {{ formatDuration(monthlyBreakTotals[month]) }}
+    </span>
   </div>
+  
 </div>
 
 <!-- Optional: Total Lunch Break Duration -->
-<div *ngIf="lunchBreakTotal" class="lunch-summary">
+<!-- <div *ngIf="lunchBreakTotal" class="lunch-summary">
   <strong>Total Lunch Break Time: {{ lunchBreakTotal }}</strong>
-</div>
+</div> -->

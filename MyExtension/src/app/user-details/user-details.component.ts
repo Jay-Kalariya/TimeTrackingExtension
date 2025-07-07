@@ -21,10 +21,12 @@ export class UserDetailsComponent implements OnInit {
   errorMessage: string = '';
 
   searchTerm: string = '';
-  lunchBreakTotal: string = '';
+  // lunchBreakTotal: string = '';
 
   monthlyTaskHistory: { [month: string]: any[] } = {};
   monthlyTotals: { [month: string]: number } = {};
+  monthlyBreakTotals: { [month: string]: number } = {};
+
 
   constructor(
     private route: ActivatedRoute,
@@ -119,7 +121,31 @@ export class UserDetailsComponent implements OnInit {
     this.monthlyTotals = monthTotals;
   }
 
-  getMonthKeys(): string[] {
+ 
+
+   processBreaks() {
+    const monthBreakTotals: { [month: string]: number } = {};
+
+    for (const b of this.breakHistory) {
+      const start = new Date(b.startTime);
+      const end = new Date(b.endTime);
+      const month = start.toLocaleString('default', { month: 'long', year: 'numeric' });
+      const duration = (end.getTime() - start.getTime()) / 1000;
+
+      if (!monthBreakTotals[month]) monthBreakTotals[month] = 0;
+      monthBreakTotals[month] += duration;
+    }
+
+    this.monthlyBreakTotals = monthBreakTotals;
+  }
+
+  formatDuration(totalSeconds: number): string {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    return `${hours}h ${minutes}m`;
+  }
+
+   getMonthKeys(): string[] {
     return Object.keys(this.monthlyTaskHistory).sort((a, b) => {
       const [monthA, yearA] = a.split(' ');
       const [monthB, yearB] = b.split(' ');
@@ -127,36 +153,6 @@ export class UserDetailsComponent implements OnInit {
       const dateB = new Date(`${monthB} 1, ${yearB}`);
       return dateB.getTime() - dateA.getTime();
     });
-  }
-
-  processBreaks() {
-    const grouped = new Map<string, { breakType: string; totalSeconds: number; date: string }>();
-
-    for (const b of this.breakHistory) {
-      const start = new Date(b.startTime);
-      const end = new Date(b.endTime);
-      const date = start.toISOString().split('T')[0];
-      const key = `${date}_${b.taskName}`;
-      const duration = (end.getTime() - start.getTime()) / 1000;
-
-      if (grouped.has(key)) {
-        grouped.get(key)!.totalSeconds += duration;
-      } else {
-        grouped.set(key, { breakType: b.taskName, totalSeconds: duration, date });
-      }
-    }
-
-    const lunchSeconds = Array.from(grouped.values())
-      .filter(b => b.breakType === 'Lunch')
-      .reduce((sum, b) => sum + b.totalSeconds, 0);
-
-    this.lunchBreakTotal = this.formatDuration(lunchSeconds);
-  }
-
-  formatDuration(totalSeconds: number): string {
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    return `${hours}h ${minutes}m`;
   }
 
   goToAdminDashboard() {
