@@ -33,7 +33,7 @@ export class UserDetailsComponent implements OnInit {
     private http: HttpClient,
     private router: Router,
     private toastr: ToastrService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.userId = Number(this.route.snapshot.paramMap.get('id'));
@@ -61,7 +61,9 @@ export class UserDetailsComponent implements OnInit {
 
         this.http.get<any[]>(`${environment.apiBaseUrl}/task/admin/history/${this.userId}`, { headers }).subscribe({
           next: data => {
-            this.breakHistory = data.filter(t => t.taskName === 'Lunch' || t.taskName === 'Day Off');
+            this.breakHistory = data.filter(t =>
+              ['Lunch', 'Day Off', 'Break'].includes(t.taskName)
+            );
             this.taskHistory = data.filter(t => !(t.taskName === 'Lunch' || t.taskName === 'Day Off'));
 
             this.aggregateTaskHistory();
@@ -121,9 +123,9 @@ export class UserDetailsComponent implements OnInit {
     this.monthlyTotals = monthTotals;
   }
 
- 
 
-   processBreaks() {
+
+  processBreaks() {
     const monthBreakTotals: { [month: string]: number } = {};
 
     for (const b of this.breakHistory) {
@@ -145,7 +147,7 @@ export class UserDetailsComponent implements OnInit {
     return `${hours}h ${minutes}m`;
   }
 
-   getMonthKeys(): string[] {
+  getMonthKeys(): string[] {
     return Object.keys(this.monthlyTaskHistory).sort((a, b) => {
       const [monthA, yearA] = a.split(' ');
       const [monthB, yearB] = b.split(' ');
