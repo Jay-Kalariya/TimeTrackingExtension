@@ -22,7 +22,7 @@
           </ul>
         </td>
         <td>
-          <button (click)="openModal(project)" class="edit-btn"> Edit</button>
+          <button (click)="openModal(project)" class="edit-btn mx-2"> Edit</button>
           <button (click)="deleteProject(project.id!)" class="delete-btn"> Delete</button>
         </td>
       </tr>
@@ -50,7 +50,7 @@
     <input [(ngModel)]="editedProjectName" placeholder="Enter new project name" />
 
     <div class="modal-actions">
-      <button (click)="saveEdit()" class="save-btn btn btn-sucess mx-2"> Save</button>
+      <button (click)="saveEdit()" class="save-btn btn btn-sucess"> Save</button>
       <button (click)="closeModal()" class="cancel-btn btn btn-denger"> Cancel</button>
     </div>
   </div>
