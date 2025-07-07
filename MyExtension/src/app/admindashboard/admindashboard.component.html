@@ -14,8 +14,8 @@
     <div class="right-controls">
       <input type="text" [(ngModel)]="searchTerm" placeholder="Search by username/email/role" />
       <div class="view-buttons">
-        <button class="btn secondary" (click)="goviewproject()">📁 View Projects</button>
-        <button class="btn secondary" (click)="goviewtask()">📝 View All Tasks</button>
+        <button class="btn secondary" (click)="goviewproject()"> View Projects</button>
+        <button class="btn secondary" (click)="goviewtask()"> View All Tasks</button>
       </div>
     </div>
 
@@ -44,7 +44,7 @@
     'status-logged': getUserStatus(user.id),
     'status-missing': !getUserStatus(user.id)
   }">
-  
+
               {{ getUserStatus(user.id) ? '✔ Logged' : '❌ Not Logged' }}
             </span>
           </td>

@@ -45,7 +45,6 @@
     </table>
   </div>
 
-  <!-- Edit Modal --><!-- Modal Test -->
 <!-- Put this outside any parent container like .task-container -->
 <div *ngIf="editingTaskId !== null" class="modal-backdrop">
   <div class="modal">
@@ -57,8 +56,8 @@
       <input id="taskName" formControlName="name" placeholder="Task name" />
 
       <div class="modal-actions">
-        <button type="submit" class="btn primary">Save</button>
-        <button type="button" class="btn secondary" (click)="cancelEdit()">Cancel</button>
+        <button type="submit" class="btn btn-info primary">Save</button>
+        <button type="button" class="btn btn-danger secondary" (click)="cancelEdit()">Cancel</button>
       </div>
     </form>
   </div>
