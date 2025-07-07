@@ -125,7 +125,7 @@ export class UserDetailsComponent implements OnInit {
       const [monthB, yearB] = b.split(' ');
       const dateA = new Date(`${monthA} 1, ${yearA}`);
       const dateB = new Date(`${monthB} 1, ${yearB}`);
-      return dateA.getTime() - dateB.getTime();
+      return dateB.getTime() - dateA.getTime();
     });
   }
 
