@@ -84,17 +84,17 @@
   background-color: #007bff;
 }
 
-.btn-edit:hover {
+/* .btn-edit:hover {
   background-color: #0056b3;
-}
+} */
 
 .btn-delete {
   background-color: #dc3545;
 }
 
-.btn-delete:hover {
+/* .btn-delete:hover {
   background-color: #b02a37;
-}
+} */
 
 .btn-save {
   background-color: #28a745;
