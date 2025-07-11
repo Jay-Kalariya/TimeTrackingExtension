@@ -1,22 +1,39 @@
-/* Ensure full viewport height */
+/* Ensure full height layout */
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+  background-color: #f5f7fb;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-#app {
-  height: 100%;
-  width: 100%;
-}
-
-app-root {
+.container {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
   display: flex;
-  height: 100%;
-  width: 100%;
+  justify-content: center;
+  align-items: center;
 }
 
+.logout {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 999;
+}
 
+/* Box to center login or content */
+.center-content {
+  max-width: 400px;
+  width: 100%;
+  padding: 2rem;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 12px;
+}
+
+/* Logout Button Style */
 .Btn {
   display: flex;
   align-items: center;
@@ -79,4 +96,3 @@ app-root {
 .Btn:active {
   transform: translate(2px, 2px);
 }
-
