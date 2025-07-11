@@ -1,4 +1,4 @@
-/* Ensure full height layout */
+/* Full screen layout */
 html, body {
   height: 100%;
   margin: 0;
@@ -7,7 +7,7 @@ html, body {
   font-family: 'Segoe UI', sans-serif;
 }
 
-/* Main container filling viewport */
+/* Root container */
 .container {
   height: 100vh;
   width: 100vw;
@@ -17,7 +17,16 @@ html, body {
   align-items: center;
 }
 
-/* Logout button in top-right */
+/* Center box (login/dashboard) */
+.center-content {
+  max-width: 500px;
+  width: 100%;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+}
+
+/* Logout button at top right */
 .logout {
   position: absolute;
   top: 20px;
@@ -25,16 +34,7 @@ html, body {
   z-index: 999;
 }
 
-/* Box to center login or routed content */
-.center-content {
-  max-width: 400px;
-  width: 100%;
-  padding: 2rem;
-  background: white;
-  border-radius: 12px;
-}
-
-/* Logout Button Style (Hover Expandable) */
+/* Logout button style */
 .Btn {
   display: flex;
   align-items: center;
@@ -47,10 +47,9 @@ html, body {
   position: relative;
   overflow: hidden;
   transition-duration: 0.3s;
-  background-color: rgb(45, 55, 252); /* Blue */
+  background-color: rgb(45, 55, 252);
 }
 
-/* Icon container */
 .sign {
   width: 100%;
   transition-duration: 0.3s;
@@ -67,7 +66,6 @@ html, body {
   fill: white;
 }
 
-/* Logout text */
 .text {
   position: absolute;
   right: 0%;
@@ -79,7 +77,6 @@ html, body {
   transition-duration: 0.3s;
 }
 
-/* Hover to expand button */
 .Btn:hover {
   width: 125px;
   border-radius: 40px;
@@ -96,7 +93,6 @@ html, body {
   padding-right: 7px;
 }
 
-/* Click effect */
 .Btn:active {
   transform: translate(2px, 2px);
 }
