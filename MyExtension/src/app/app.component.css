@@ -30,7 +30,7 @@ app-root {
   overflow: hidden;
   transition-duration: 0.3s;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-  background-color: rgb(255, 65, 65);
+  background-color: rgb(45, 55, 252);
 }
 
 .sign {
