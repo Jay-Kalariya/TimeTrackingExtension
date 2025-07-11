@@ -61,17 +61,6 @@ select, button {
   border: 1px solid #ccc;
 }
 
-/* button {
-  background-color: #007acc;
-  color: white;
-  border: none;
-  transition: background 0.3s ease;
-} */
-
-/* button:hover {
-  background-color: #005fa3;
-} */
-
 .delete-btn {
   background-color: #e74c3c;
 }
