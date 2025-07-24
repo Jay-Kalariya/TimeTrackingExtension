@@ -1,11 +1,13 @@
 using System;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks; // <-- This is for async Task
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Dotnet1.Models;
-using System.Linq;
+using ModelTask = Dotnet1.Models.Task; // <-- Avoid Task conflict
 
 namespace Dotnet1.Services
 {
@@ -23,46 +25,41 @@ namespace Dotnet1.Services
 
         public System.Threading.Tasks.Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("✅ TaskCronJob started...");
-            _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
+            _logger.LogInformation("TaskCronJob started.");
+            _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
             return System.Threading.Tasks.Task.CompletedTask;
         }
 
-        private async void DoWork(object state)
+        private void DoWork(object state)
         {
             using var scope = _scopeFactory.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<TimeTrackingContext>();
 
-            var now = DateTime.UtcNow;
-            var cutoff = now.AddMinutes(-6); // ✅ Safe for SQL translation
+            var now = DateTime.Now;
 
-            try
+            var activeSessions = db.TaskSessions
+                .Include(ts => ts.Task)
+                .Include(ts => ts.User)
+                .Where(ts => ts.EndTime == null)
+                .ToList();
+
+            foreach (var session in activeSessions)
             {
-                var inactiveSessions = await db.TaskSessions
-                    .Where(t => t.EndTime == null && t.StartTime < cutoff)
-                    .ToListAsync();
+                var duration = (now - session.StartTime).TotalSeconds;
 
-                foreach (var session in inactiveSessions)
+                if (duration >= 28800) // 8 hours
                 {
                     session.EndTime = now;
-                    _logger.LogInformation($"🛑 Auto-ended session ID: {session.Id}");
+                    _logger.LogInformation($"Ended session for Task ID {session.TaskId} - Duration: {TimeSpan.FromSeconds(duration)}");
                 }
+            }
 
-                if (inactiveSessions.Any())
-                {
-                    await db.SaveChangesAsync();
-                    _logger.LogInformation($"✅ Saved {inactiveSessions.Count} ended sessions.");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "❌ Error while checking inactive sessions in TaskCronJob.");
-            }
+            db.SaveChanges();
         }
 
         public System.Threading.Tasks.Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("🛑 TaskCronJob stopped.");
+            _logger.LogInformation("TaskCronJob stopped.");
             _timer?.Change(Timeout.Infinite, 0);
             return System.Threading.Tasks.Task.CompletedTask;
         }
