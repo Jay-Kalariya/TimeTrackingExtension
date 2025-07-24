@@ -1,13 +1,14 @@
 using System;
 using System.Linq;
+using System.Text;
 using System.Threading;
-using System.Threading.Tasks; // <-- This is for async Task
+using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Dotnet1.Models;
-using ModelTask = Dotnet1.Models.Task; // <-- Avoid Task conflict
+using ModelTask = Dotnet1.Models.Task;
 
 namespace Dotnet1.Services
 {
@@ -23,20 +24,20 @@ namespace Dotnet1.Services
             _scopeFactory = scopeFactory;
         }
 
-        public System.Threading.Tasks.Task StartAsync(CancellationToken cancellationToken)
+        public  System.Threading.Tasks.Task  StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("TaskCronJob started.");
-            _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
-            return System.Threading.Tasks.Task.CompletedTask;
+            _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromMinutes(1)); // Runs every 1 minute
+            return  System.Threading.Tasks.Task .CompletedTask;
         }
 
         private void DoWork(object state)
         {
             using var scope = _scopeFactory.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<TimeTrackingContext>();
-
             var now = DateTime.Now;
 
+            // --- 1. Auto-close sessions that exceed 8 hours ---
             var activeSessions = db.TaskSessions
                 .Include(ts => ts.Task)
                 .Include(ts => ts.User)
@@ -55,13 +56,76 @@ namespace Dotnet1.Services
             }
 
             db.SaveChanges();
+
+            // --- 2. Send Daily Report ---
+            var startOfDay = now.Date;
+            var endOfDay = startOfDay.AddDays(1);
+
+            var dailySessions = db.TaskSessions
+                .Include(ts => ts.User)
+                .Where(ts => ts.StartTime >= startOfDay && ts.StartTime < endOfDay)
+                .ToList();
+
+            var groupedByUser = dailySessions
+                .GroupBy(s => s.User);
+
+            foreach (var group in groupedByUser)
+            {
+                var user = group.Key;
+                var totalSeconds = group.Sum(s => ((s.EndTime ?? now) - s.StartTime).TotalSeconds);
+                var message = $"Hello {user.Username},\n\nYour total tracked time today: {TimeSpan.FromSeconds(totalSeconds):hh\\:mm\\:ss}.";
+
+                // Simulated email log
+                _logger.LogInformation($"[Daily Report] To: {user.Email}\n{message}");
+
+                // TODO: Send actual email here via IEmailService.Send(user.Email, "Daily Time Report", message);
+            }
+
+            // --- 3. Send Monthly Report on the 1st of each month ---
+            if (now.Day == 1)
+            {
+                var startOfMonth = new DateTime(now.Year, now.Month - 1, 1);
+                var endOfMonth = new DateTime(now.Year, now.Month, 1);
+
+                var monthlySessions = db.TaskSessions
+                    .Include(ts => ts.User)
+                    .Where(ts => ts.StartTime >= startOfMonth && ts.StartTime < endOfMonth)
+                    .ToList();
+
+                var monthlyGrouped = monthlySessions.GroupBy(s => s.User);
+
+                foreach (var group in monthlyGrouped)
+                {
+                    var user = group.Key;
+                    var totalSeconds = group.Sum(s => ((s.EndTime ?? now) - s.StartTime).TotalSeconds);
+
+                    var sb = new StringBuilder();
+                    sb.AppendLine($"Hello {user.Username},");
+                    sb.AppendLine($"Here is your tracked time report for {startOfMonth:MMMM yyyy}:");
+                    sb.AppendLine($"Total time: {TimeSpan.FromSeconds(totalSeconds):hh\\:mm\\:ss}");
+
+                    // Optionally: include a breakdown per task
+                    foreach (var taskGroup in group.GroupBy(s => s.TaskId))
+                    {
+                        var taskId = taskGroup.Key;
+                        var taskTime = taskGroup.Sum(s => ((s.EndTime ?? now) - s.StartTime).TotalSeconds);
+                        sb.AppendLine($" - Task #{taskId}: {TimeSpan.FromSeconds(taskTime):hh\\:mm\\:ss}");
+                    }
+
+                    var fullMessage = sb.ToString();
+
+                    _logger.LogInformation($"[Monthly Report] To: {user.Email}\n{fullMessage}");
+
+                    // TODO: Send actual email here via IEmailService.Send(user.Email, "Monthly Time Report", fullMessage);
+                }
+            }
         }
 
-        public System.Threading.Tasks.Task StopAsync(CancellationToken cancellationToken)
+        public  System.Threading.Tasks.Task  StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("TaskCronJob stopped.");
             _timer?.Change(Timeout.Infinite, 0);
-            return System.Threading.Tasks.Task.CompletedTask;
+            return  System.Threading.Tasks.Task .CompletedTask;
         }
 
         public void Dispose()
