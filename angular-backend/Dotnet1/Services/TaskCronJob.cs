@@ -34,20 +34,30 @@ namespace Dotnet1.Services
             var db = scope.ServiceProvider.GetRequiredService<TimeTrackingContext>();
 
             var now = DateTime.UtcNow;
+            var cutoff = now.AddMinutes(-6); // ✅ Safe for SQL translation
 
-            // Check sessions that have been active more than 5 minutes
-            var inactiveSessions = await db.TaskSessions
-                .Where(t => t.EndTime == null && now - t.StartTime > TimeSpan.FromMinutes(6))
-                .ToListAsync();
-
-            foreach (var session in inactiveSessions)
+            try
             {
-                session.EndTime = now;
-                _logger.LogInformation($"🛑 Ended session: {session.Id}");
-            }
+                var inactiveSessions = await db.TaskSessions
+                    .Where(t => t.EndTime == null && t.StartTime < cutoff)
+                    .ToListAsync();
 
-            if (inactiveSessions.Any())
-                await db.SaveChangesAsync();
+                foreach (var session in inactiveSessions)
+                {
+                    session.EndTime = now;
+                    _logger.LogInformation($"🛑 Auto-ended session ID: {session.Id}");
+                }
+
+                if (inactiveSessions.Any())
+                {
+                    await db.SaveChangesAsync();
+                    _logger.LogInformation($"✅ Saved {inactiveSessions.Count} ended sessions.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error while checking inactive sessions in TaskCronJob.");
+            }
         }
 
         public System.Threading.Tasks.Task StopAsync(CancellationToken cancellationToken)
