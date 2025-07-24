@@ -22,6 +22,9 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<TaskService>();
 builder.Services.AddScoped<AdminTaskService>();
 builder.Services.AddScoped<ProjectService>();
+// Cron job background service
+builder.Services.AddHostedService<TaskCronJob>();
+
 
 // 3. Register controllers
 builder.Services.AddControllers()
@@ -80,6 +83,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+// var builder = WebApplication.CreateBuilder(args);
 
 // 8. Auto-seed admin user if not exists
 using (var scope = app.Services.CreateScope())
